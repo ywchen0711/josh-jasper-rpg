@@ -88,6 +88,22 @@
   }
   var GREEN = ['#24602c', '#34823a', '#4aa04a', '#9ad86a'], OLIVE = ['#3e5a30', '#56783e', '#6e9450', '#c0d888'];
 
+  // ---------- roofs: [top, bottom, lit edge, gap, speckles...] ----------
+  var ROOFS = {
+    terracotta: ['#c46a44', '#9a4a2e', '#d88058', '#7a3420', '#e09070', '#8a3e26'],
+    slate:      ['#7a8494', '#5a6272', '#98a2b2', '#40485a', '#aab4c4', '#4a5262'],
+    brown:      ['#9a7454', '#76543a', '#b48c6a', '#5a3e28', '#c49a78', '#644630'],
+    navy:       ['#4a6aa8', '#34508a', '#6a8ac8', '#22386a', '#8aa8e0', '#2a4478']
+  };
+  function roof(g, c) {
+    vgrad(g, 0, 0, 16, 16, c[0], c[1]);
+    for (var y = 0; y < 16; y += 4) for (var x = (y / 4 % 2) * 4 - 4; x < 16; x += 8) {
+      g.fillStyle = c[2]; g.fillRect(x + 0.5, y + 0.5, 7, 0.5);                    // lit top of each shingle
+      g.fillStyle = c[3]; g.fillRect(x, y + 3.5, 8, 0.5); g.fillRect(x + 7.5, y, 0.5, 4);
+    }
+    speck(g, [c[4], c[5]], 10, 47);
+  }
+
   // ---------- walls ----------
   function stucco(g, top, bottom) { vgrad(g, 0, 0, 16, 16, top, bottom); speck(g, ['rgba(0,0,0,0.06)', 'rgba(255,255,255,0.12)'], 24, 41); }
   function glass(g, x, y, w, h) {
@@ -128,6 +144,17 @@
       stone(g, '#50505a', '#46464f', '#5e5e68', 9); speck(g, ['#3a3a42', '#6a6a74'], 18, 13);
       g.fillStyle = '#e8c838'; g.fillRect(0, 7, 8, 2); g.fillStyle = '#fff07a'; g.fillRect(0, 7, 8, 0.5);
     } },
+    crosswalk:{ draw: function (g) {
+      stone(g, '#50505a', '#46464f', '#5e5e68', 9);
+      for (var y = 1; y < 16; y += 5) { g.fillStyle = '#e8e8e0'; g.fillRect(2, y, 12, 3); g.fillStyle = '#ffffff'; g.fillRect(2, y, 12, 0.5); g.fillStyle = 'rgba(0,0,0,0.15)'; g.fillRect(2, y + 2.5, 12, 0.5); }
+    } },
+    lamp:     { solid: true, tall: 1, light: { r: 2.6, color: 'rgba(255,214,150,A)' }, draw: function (g) { grass(g, 101); },
+                drawTall: function (g, f, h) {
+                  g.fillStyle = '#3a3e48'; g.fillRect(6.5, h - 3, 3, 2);
+                  g.fillStyle = '#4a505c'; g.fillRect(7.5, h - 24, 1.5, 22); g.fillStyle = '#8a92a0'; g.fillRect(7.5, h - 24, 0.5, 22);
+                  g.fillStyle = '#2a2e38'; g.fillRect(5, h - 27, 6.5, 2);
+                  g.fillStyle = '#fff2c0'; g.fillRect(5.5, h - 25, 5.5, 2.5); g.fillStyle = '#ffffff'; g.fillRect(6, h - 25, 2, 1);
+                } },
     sidewalk: { draw: function (g) {
       vgrad(g, 0, 0, 16, 16, '#d4d0c4', '#c4c0b4');
       g.fillStyle = '#a4a094'; g.fillRect(0, 15.5, 16, 0.5); g.fillRect(15.5, 0, 0.5, 16);
@@ -176,14 +203,10 @@
       [5, 10].forEach(function (y) { g.fillStyle = '#c8c0b0'; g.fillRect(0, y, 16, 2); g.fillStyle = '#ffffff'; g.fillRect(0, y, 16, 0.5); });
       [1, 7, 13].forEach(function (x) { g.fillStyle = '#d8d0c0'; g.fillRect(x, 3, 2, 11); g.fillStyle = '#ffffff'; g.fillRect(x, 3, 0.5, 11); g.fillStyle = '#a8a090'; g.fillRect(x + 1.5, 3, 0.5, 11); });
     } },
-    roof:     { solid: true, draw: function (g) {
-      vgrad(g, 0, 0, 16, 16, '#c46a44', '#9a4a2e');
-      for (var y = 0; y < 16; y += 4) for (var x = (y / 4 % 2) * 4 - 4; x < 16; x += 8) {
-        g.fillStyle = '#d88058'; g.fillRect(x + 0.5, y + 0.5, 7, 0.5);                    // lit top of each shingle
-        g.fillStyle = '#7a3420'; g.fillRect(x, y + 3.5, 8, 0.5); g.fillRect(x + 7.5, y, 0.5, 4);
-      }
-      speck(g, ['#e09070', '#8a3e26'], 10, 47);
-    } },
+    roof:     { solid: true, draw: function (g) { roof(g, ROOFS.terracotta); } },
+    roofSlate:{ solid: true, draw: function (g) { roof(g, ROOFS.slate); } },
+    roofBrown:{ solid: true, draw: function (g) { roof(g, ROOFS.brown); } },
+    roofNavy: { solid: true, draw: function (g) { roof(g, ROOFS.navy); } },
     houseWall:{ solid: true, draw: function (g) {
       stucco(g, '#f4e8cc', '#e4d4b4');
       g.fillStyle = '#c8b898'; g.fillRect(0, 14, 16, 2); g.fillStyle = '#f8f0dc'; g.fillRect(0, 14, 16, 0.5);

@@ -49,7 +49,7 @@ RPG.addText('en', {
     mom: 'Mom', puppy: 'Puppy', oldman: 'Grandpa on a Walk', neighborKid: 'Neighbor Kid', jogger: 'Jogger',
     ranger: 'Canyon Ranger', hiker: 'Hiker', principal: 'Principal', nurse: 'School Nurse', clerk: 'Store Lady', coach: 'Coach',
     mascot: 'Coyote Mascot', leo: 'Leo', mia: 'Mia', ethan: 'Ethan', librarian: 'Librarian',
-    robomax: 'RoboVac MAX', king: 'Raccoon King'
+    robomax: 'RoboVac MAX', king: 'Raccoon King', guard: 'Crossing Guard'
   },
   character: {
     josh:   { name: 'Josh', title: 'Big Brother · Sports Star', bio: 'Great at soccer and running, always first in line to protect his little brother. Catchphrase: "Leave it to me!"' },
@@ -184,7 +184,13 @@ RPG.addText('en', {
   },
   street: {
     neighborDoor: 'The neighbors\' door is locked. A note says: "Gone to Field Day!"',
-    sign: '"Sage Canyon Community Park"   ↑ Canyon Trail   → Sage Canyon Elementary',
+    parkSign: '"Sage Canyon Park"   → Sage Canyon Elementary   ↑ Home is across Carmel Mountain Rd',
+    trailSign: '"Sage Canyon Trail" Stay on the trail. Watch out for rattlesnakes and... raccoons?',
+    signFoxhound: 'Street sign: Foxhound Way',
+    signCarmel: 'Street sign: Harvest Run Dr / Carmel Mountain Rd',
+    signHunters: 'Street sign: Hunters Glen Dr',
+    restroom: "The park's public restroom. ...Not right now, thanks.",
+    guard: 'Use the crosswalk on Carmel Mountain Rd, and look both ways!',
     mochi: {
       see: 'A little shiba pup is running circles in the park. Its collar says "Mochi".',
       stare: "Mochi is staring at your pocket. Drool incoming...",

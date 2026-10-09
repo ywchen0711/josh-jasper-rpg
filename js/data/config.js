@@ -38,7 +38,8 @@
       'k': 'blacktop', 'h': 'hopscotch', 'X': 'schoolWall', 'x': 'schoolWin', 'E': 'schoolDoor', 'L': 'lunchTable', 'Q': 'snackBar',
       'F': 'field', 'l': 'fieldLine', 'J': 'flagpole',
       'a': 'carpet', 'Z': 'libWall', 'm': 'labFloor', 'd': 'labDesk', 'M': 'machine',
-      'q': 'caveFloor', 'W': 'caveWall', 't': 'trash', ' ': 'dark'
+      'q': 'caveFloor', 'W': 'caveWall', 't': 'trash', ' ': 'dark',
+      'z': 'crosswalk', 'i': 'lamp', 'A': 'roofSlate', 'G': 'roofBrown', 'N': 'roofNavy'
     }
   });
 

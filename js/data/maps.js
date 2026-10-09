@@ -30,7 +30,8 @@
     kidA:      { H: '#2a1a10', T: '#4a9ad8', P: '#3a3a4a' },
     kidB:      { H: '#c89040', T: '#e05a8a', P: '#5a3a6a' },
     kidC:      { H: '#1a1a1a', T: '#f0d040', P: '#2a4a2a' },
-    oldman:    { H: '#e0e0e0', T: '#8a6a4a', P: '#4a4a4a', G: '#8a6a4a' }
+    oldman:    { H: '#e0e0e0', T: '#8a6a4a', P: '#4a4a4a', G: '#8a6a4a' },
+    guard:     { H: '#3a2a1a', T: '#f0e040', P: '#3a3a5a', G: '#f0e040' }
   };
   var WARM = 'rgba(255,196,120,A)', COOL = 'rgba(140,200,255,A)', SUN = 'rgba(255,236,190,A)';
 
@@ -51,7 +52,7 @@
         '#S==========S#',
         '######=#######'
       ],
-      warps: [{ x: 6, y: 8, to: 'street', tx: 4, ty: 4, dir: 'down' }],
+      warps: [{ x: 6, y: 8, to: 'street', tx: 20, ty: 10, dir: 'down' }],
       chests: [{ x: 12, y: 6, item: 'eraser', flag: 'chest_home' }],
       npcs: [
         { id: 'mom', x: 11, y: 2, sprite: 'adult', palette: PAL.mom, name: 'mom', dir: 'left', script: [
@@ -65,41 +66,78 @@
     },
 
     // ======================= the neighborhood =======================
+    // Laid out after the real streets around Sage Canyon School (Carmel Valley, San Diego):
+    // Foxhound Way (home), Carmel Mountain Rd (the big divided road), Cherry Hill Dr, Harvest Run Dr,
+    // Spur Point Ct, Hunters Glen Dr, Quaker Hill Ln, Whispering Hills Ln, Sage Canyon Park and the school.
     street: {
       bg: '#5c9c48', backdrop: 'street',
-      particles: 'leaves', grade: 'warm', bloom: 0.36, vignette: 0.45,
+      particles: 'leaves', grade: 'warm', bloom: 0.32, vignette: 0.45,
       rows: [
-        'TTTTTTTTTTTTTpppTTTTTTTTTTTTTT',
-        'T^^^^^^^....TpppT...^^^^^^^..T',
-        'T^^^^^^^.,..bpppb.,.^^^^^^^..T',
-        'THwHDHwH.....ppp....HwHDHwH,.T',
-        'T...s........ppp.......s.....T',
-        'Tsssssssssssssssssssssssssssss',
-        'TRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
-        'T-----------------------------',
-        'TRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
-        'Tsssssssssssssssssssssssssssss',
-        'T...,....T.......!.....T...,.T',
-        'T..~~~~.......,.......b......T',
-        'T.~~~~~~..b..........,.......T',
-        'T.~~~~~~.....T.........b.....T',
-        'T..~~~~...,.......,..........T',
-        'T....b.......P.........P.....T',
-        'T.,..........................T',
-        'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT'
+        'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTpppTTTTTTTTTTTTTTTTTTTTTTTTT',
+        'T..sRRs....sRRs.."b""T"...""""b"ppp.""....T.."""T..........T',
+        'T..sRRsAAA.sRRs...."".".."".""".ppp""""."""."".""..GGG.AAA.T',
+        'T..sRRswHw.sRRs...bT"..""""T....ppp.."..."""b"."T..wHw.wHw.T',
+        'T..sRRs....sRRs..T".""T.""TRRRRTpppb"."."""T"".."..........T',
+        'T..sRRs^^^.sRRs..T""""."T."RRRR.ppp"..."....".."...GGG.^^^.T',
+        'T..sRRswHw.sRRs...T...TGGG.TRR".ppp.T.b..."."."....wHw.wHw.T',
+        'T..sRRs....sRRs........wHw..RR.!ppp........................T',
+        'T..sRRsAAA.sRRsGGG.NNN.AAA..RR..ppp.GGG.^^^.AAA.GGG.AAA....T',
+        'T..sRRswHw.sRRswHw.wDw.wDw..RR.ipppiwHw.wHw.wHw.wHw.wHw....T',
+        'T..sRRssssssRRssssssssssssssRRsssssssssssssssssssssssssss..T',
+        'T..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..T',
+        'T..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..T',
+        'T..sRRssssssRRsssssssssssssssssssssssssssssssssssssssssss..T',
+        'T..sRR.AAA.sRRsGGG.^^^.AAA.GGG.AAA.^^^.GGG.^^^.AAA.GGG.....T',
+        'T..sRR.wHw.sRRswHw.wHw.wHw.wHw.wHw.wHw.wHw.wHw.wHw.wHw.....T',
+        'T..sRR.....sRRs............................................T',
+        'Tb.sRR.b..bsRRs.b..b..b..b..b..b..b..b..b..b..b..b..b..b...T',
+        'TsssRRssssssRRsssssssssssssssssssssssssssssssssssssssssssssT',
+        'TRRRRRzRRRRRRRzRRRRRRRRRRRRRRRRRRRRRRRRRRzRRRRRRRRRRRRRRRRRT',
+        'T--RRRz-----RRz--------------------------zRR---------------T',
+        'T,,sRRz,,,,,RRz,,,,,,,,,,,,,,,,,,,,,,,,,,zRR,,,,,,,,,,,,,,,T',
+        'T--RRRz-----RRz--------------------------zRR---------------T',
+        'TRRRRRzRRRRRRRzRRRRRRRRRRRRRRRRRRRRRRRRRRzRRRRRRRRRRRRRRRRRT',
+        'TsssRRssssssssssssssssssssssssssssssssssssRRsssssssssssssssT',
+        'T..sRR...i..DH.p....i.T.iXXXXXXXXXXXXXXXisRRs..............T',
+        'T..sRR..T......pT!.,....kxxxxxxXEXxxxxxxksRRsssssssssssssssT',
+        'T..sRR....ppppppppppp...kkkkkkkkkkkkkkkkksRRRRRRRRRRRRRRRRRT',
+        'T..sRR...,.....p........kkkkkkkkkkkkkkkkksRRRRRRRRRRRRRRRRRT',
+        'T..sRR.....T...p.....T..kkkLLkkkkkkkJkkkksRR.ssssss."T"."".T',
+        'T..sRR.T......,p....,...kkkkkkkkkkkkkkkkksRR.GGG.^^^"AAA.T.T',
+        'T..sRRssssssssssssssssssssssssssssssssssssRRswHwswHw"wHw"".T',
+        'T..sRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR.".....".T',
+        'T..sRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR.."b"."..T',
+        'T.....ssssssssssssssssssssssssssssssssssssssssssRR."T""..".T',
+        'T.................RR.^^^.GGG......AAA.GGG.AAA..sRRs""......T',
+        'T......RRRRRRRRRRRRR.wHw.wHw......wHw.wHw.wHw..sRRs""."T.""T',
+        'T......RRRRRRRRRRRRR...........................sRRs"""T...bT',
+        'T.b"..AAA.^^^.GGG.RR.""TT""."b"."T..T"".""".Tb"sRRs.."T.""TT',
+        'T.."..wHw.wHw.wHw.RRGGG"..T.""."."."""""..T""".sRRs.T"""...T',
+        'T".b..............RRwHw"."..""""."."..""".""bT"sRRs"""T"...T',
+        'T."...............RR..".""""T".""""TT....."""".sRRs"...""T.T',
+        'T..T.............RRRR..b""."."."".."""".."".""TsRRs."."".""T',
+        'T."..............RRRR""."".""T...""T""...""".".sRRs""T"".b.T',
+        'TT.".................""."""TT"bT."..."...".."""sRRsT."T"...T',
+        'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT'
       ],
       warps: [
-        { x: 4, y: 3, to: 'home', tx: 6, ty: 7, dir: 'up' },
-        { x: 13, y: 0, to: 'canyon', tx: 13, ty: 19, dir: 'up' }, { x: 14, y: 0, to: 'canyon', tx: 14, ty: 19, dir: 'up' }, { x: 15, y: 0, to: 'canyon', tx: 14, ty: 19, dir: 'up' },
-        { x: 29, y: 6, to: 'school', tx: 1, ty: 8, dir: 'right' }, { x: 29, y: 7, to: 'school', tx: 1, ty: 8, dir: 'right' }, { x: 29, y: 8, to: 'school', tx: 1, ty: 8, dir: 'right' }
+        { x: 20, y: 9, to: 'home', tx: 6, ty: 7, dir: 'up' },
+        { x: 32, y: 0, to: 'canyon', tx: 13, ty: 19, dir: 'up' }, { x: 33, y: 0, to: 'canyon', tx: 14, ty: 19, dir: 'up' }, { x: 34, y: 0, to: 'canyon', tx: 14, ty: 19, dir: 'up' },
+        { x: 32, y: 26, to: 'school', tx: 1, ty: 8, dir: 'right' }
       ],
+      encounters: { rate: 0.07, troops: [['lizard', 4], ['lizards', 2], ['bees', 1]] },      // only in the tall grass of the open space
       events: [
-        { x: 23, y: 3, trigger: 'touch', script: [{ say: 'street.neighborDoor' }] },
-        { x: 17, y: 10, trigger: 'action', script: [{ say: 'street.sign' }] }
+        { x: 24, y: 9, trigger: 'touch', script: [{ say: 'street.neighborDoor' }] },
+        { x: 12, y: 25, trigger: 'touch', script: [{ say: 'street.restroom' }] },
+        { x: 17, y: 26, trigger: 'action', script: [{ say: 'street.parkSign' }] },
+        { x: 31, y: 7, trigger: 'action', script: [{ say: 'street.trailSign' }] },
+        { x: 16, y: 16, trigger: 'action', script: [{ say: 'street.signFoxhound' }] },
+        { x: 2, y: 17, trigger: 'action', script: [{ say: 'street.signCarmel' }] },
+        { x: 45, y: 25, trigger: 'action', script: [{ say: 'street.signHunters' }] }
       ],
-      chests: [{ x: 1, y: 16, item: 'cookie', count: 2, flag: 'chest_park' }],
+      chests: [{ x: 22, y: 26, item: 'cookie', count: 2, flag: 'chest_park' }, { x: 54, y: 41, item: 'juice', flag: 'chest_hills' }],
       npcs: [
-        { id: 'mochi', x: 20, y: 13, sprite: 'mochi', name: 'puppy', wander: 2, hideIf: { member: 'mochi' }, script: [
+        { id: 'mochi', x: 18, y: 28, sprite: 'mochi', name: 'puppy', wander: 2, hideIf: { member: 'mochi' }, script: [
           { say: 'street.mochi.see', name: null },
           { if: { item: 'cookie' }, then: [
             { choice: ['street.mochi.give', 'street.mochi.pet'], text: 'street.mochi.stare', name: null, then: [
@@ -109,14 +147,17 @@
             ] }
           ], 'else': [{ say: 'street.mochi.hungry', name: null }] }
         ] },
-        { id: 'oldman', x: 7, y: 9, sprite: 'adult', palette: PAL.oldman, name: 'oldman', wander: 3, script: [
+        { id: 'oldman', x: 30, y: 13, sprite: 'adult', palette: PAL.oldman, name: 'oldman', wander: 3, script: [
           { say: 'street.oldman' }
         ] },
-        { id: 'kid1', x: 25, y: 12, sprite: 'kid', palette: PAL.kidA, name: 'neighborKid', wander: 2, script: [
+        { id: 'kid1', x: 26, y: 13, sprite: 'kid', palette: PAL.kidA, name: 'neighborKid', wander: 2, script: [
           { say: ['street.kid.1', 'street.kid.2'] }
         ] },
-        { id: 'jogger', x: 18, y: 15, sprite: 'adult', palette: PAL.kidC, name: 'jogger', wander: 4, script: [
+        { id: 'jogger', x: 25, y: 24, sprite: 'adult', palette: PAL.kidC, name: 'jogger', wander: 4, script: [
           { say: 'street.jogger' }
+        ] },
+        { id: 'guard', x: 15, y: 24, sprite: 'adult', palette: PAL.guard, name: 'guard', script: [
+          { say: 'street.guard' }
         ] }
       ]
     },
@@ -151,7 +192,7 @@
       ],
       legend: { 'q': 'caveFloor' },
       warps: [
-        { x: 14, y: 20, to: 'street', tx: 14, ty: 1, dir: 'down' },
+        { x: 14, y: 20, to: 'street', tx: 33, ty: 1, dir: 'down' },
         { x: 5, y: 1, to: 'cave', tx: 11, ty: 10, dir: 'up' }
       ],
       encounters: { rate: 0.12, troops: [['lizard', 4], ['lizards', 3], ['gull', 3], ['bees', 2], ['crows', 1], ['canyonMix', 1]] },
@@ -198,7 +239,7 @@
         'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT'
       ],
       warps: [
-        { x: 0, y: 8, to: 'street', tx: 28, ty: 7, dir: 'left' },
+        { x: 0, y: 8, to: 'street', tx: 32, ty: 27, dir: 'down' },
         { x: 11, y: 1, to: 'library', tx: 11, ty: 14, dir: 'up', 'if': 'quest' }
       ],
       events: [

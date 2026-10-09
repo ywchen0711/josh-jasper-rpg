@@ -49,7 +49,7 @@ RPG.addText('zh', {
     mom: '媽媽', puppy: '小狗', oldman: '散步的爺爺', neighborKid: '鄰居小孩', jogger: '慢跑的叔叔',
     ranger: '峽谷管理員', hiker: '登山客', principal: '校長', nurse: '保健室阿姨', clerk: '福利社阿姨', coach: 'Coach',
     mascot: '郊狼吉祥物', leo: '同學 Leo', mia: '同學 Mia', ethan: '同學 Ethan', librarian: '圖書館阿姨',
-    robomax: '掃地機器人 MAX', king: '浣熊大王'
+    robomax: '掃地機器人 MAX', king: '浣熊大王', guard: '導護媽媽'
   },
   character: {
     josh:   { name: 'Josh', title: '哥哥・運動健將', bio: '踢足球、跑步樣樣行，衝第一個保護弟弟。口頭禪是「交給我！」' },
@@ -184,7 +184,13 @@ RPG.addText('zh', {
   },
   street: {
     neighborDoor: '鄰居家的門鎖著。門上貼著：「去看運動會了！」',
-    sign: '「Sage Canyon 社區公園」　↑ 峽谷步道　→ Sage Canyon 小學',
+    parkSign: '「Sage Canyon 公園」　→ Sage Canyon 小學　↑ 過了 Carmel Mountain Rd 就是我們家',
+    trailSign: '「Sage Canyon 峽谷步道」　請走在步道上，小心響尾蛇和……浣熊？',
+    signFoxhound: '路牌：Foxhound Way',
+    signCarmel: '路牌：Harvest Run Dr ／ Carmel Mountain Rd',
+    signHunters: '路牌：Hunters Glen Dr',
+    restroom: '公園的公共廁所。……現在不用，謝謝。',
+    guard: '過 Carmel Mountain Rd 要走斑馬線，左右都看一看喔！',
     mochi: {
       see: '一隻柴犬小狗在公園裡打轉。項圈上寫著「麻糬」。',
       stare: '麻糬盯著你的口袋，口水快滴下來了……',
