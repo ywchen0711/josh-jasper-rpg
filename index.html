@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Josh &amp; Jasper 大冒險</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+  <canvas id="screen" width="320" height="240"></canvas>
+
+  <div id="touch" hidden>
+    <div class="dpad">
+      <button data-k="up" class="u">▲</button>
+      <button data-k="left" class="l">◀</button>
+      <button data-k="right" class="r">▶</button>
+      <button data-k="down" class="d">▼</button>
+    </div>
+    <div class="abtns">
+      <button data-k="menu" class="m">選單</button>
+      <button data-k="cancel" class="b">B</button>
+      <button data-k="ok" class="a">A</button>
+    </div>
+  </div>
+
+  <!-- engine -->
+  <script src="js/core.js?v=1"></script>
+  <script src="js/render.js?v=1"></script>
+  <script src="js/ui.js?v=1"></script>
+  <script src="js/script.js?v=1"></script>
+  <script src="js/effects.js?v=1"></script>
+  <script src="js/main.js?v=1"></script>
+  <script src="js/scenes/map.js?v=1"></script>
+  <script src="js/scenes/battle.js?v=1"></script>
+  <script src="js/scenes/menu.js?v=1"></script>
+  <!-- game data: add new content here -->
+  <script src="js/data/sprites.js?v=1"></script>
+  <script src="js/data/tiles.js?v=1"></script>
+  <script src="js/data/visuals.js?v=1"></script>
+  <script src="js/data/skills.js?v=1"></script>
+  <script src="js/data/items.js?v=1"></script>
+  <script src="js/data/characters.js?v=1"></script>
+  <script src="js/data/enemies.js?v=1"></script>
+  <script src="js/data/config.js?v=1"></script>
+  <script src="js/data/maps.js?v=1"></script>
+  <script>RPG.start();</script>
+</body>
+</html>
