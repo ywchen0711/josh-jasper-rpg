@@ -45,9 +45,9 @@
   RPG.clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
 
   RPG.STATS = ['maxHp', 'maxMp', 'atk', 'def', 'mag', 'spd', 'luck'];
-  RPG.STAT_NAMES = { maxHp: 'HP', maxMp: 'MP', atk: '攻擊', def: '防禦', mag: '魔力', spd: '速度', luck: '幸運' };
+  RPG.statName = function (k) { return RPG.t('stat.' + k); };
   RPG.SLOTS = ['weapon', 'armor', 'accessory'];
-  RPG.SLOT_NAMES = { weapon: '武器', armor: '衣服', accessory: '飾品' };
+  RPG.slotName = function (s) { return RPG.t('slot.' + s); };
 
   // ======================= party members =======================
   RPG.expFor = function (level) {                       // total exp needed to reach `level`
@@ -159,8 +159,8 @@
   RPG.saveSummary = function (slot) {
     var s = RPG.loadSlot(slot);
     if (!s) return null;
-    var lead = s.members[s.party[0]], map = RPG.db.maps[s.map];
+    var lead = s.members[s.party[0]];
     var t = Math.floor(s.time / 60);
-    return (map ? map.name : s.map) + '  Lv' + lead.level + '  ' + Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+    return RPG.name('maps', s.map) + '  Lv' + lead.level + '  ' + Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
   };
 })();

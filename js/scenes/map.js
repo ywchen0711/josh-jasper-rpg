@@ -1,10 +1,12 @@
 /*
  * The map scene: grid movement with smooth steps, party members following in a line, NPCs, chests,
  * events, warps and random encounters. Maps come from js/data/maps.js.
+ * Drawing (HD-2D): the map is drawn into a "world" canvas with shadows, tall objects, particles and lights,
+ * then tilted into the screen with depth of field and bloom (js/fx.js). Without effects it draws straight to the screen.
  */
 (function () {
   'use strict';
-  var g = RPG.g, T = RPG.TILE;
+  var T = RPG.TILE;
   var DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   var STEP = 8;                                        // frames per tile
 
@@ -18,12 +20,28 @@
       this.w = m.rows[0].length; this.h = m.rows.length;
       var s = RPG.state;
       this.player = { x: s.x, y: s.y, fx: s.x, fy: s.y, dir: s.dir || 'down', t: 0, moving: false, from: null };
-      this.trail = [];                                 // previous player tiles, for the followers
+      this.trail = [];
       for (var i = 0; i < 4; i++) this.trail.push({ x: s.x, y: s.y, dir: s.dir });
       this.npcs = (m.npcs || []).map(function (n) { return Object.assign({ x0: n.x, y0: n.y, fx: n.x, fy: n.y, dir: n.dir || 'down', t: 0, wanderT: RPG.ri(60, 180) }, n); });
       this.busy = false;
-      this.banner = m.name; this.bannerT = 150;
+      this.bannerT = 150;
       this.encounterSteps = 0;
+      this.prepare();
+    },
+    // light sources from tiles, and ambient-occlusion edges under walls
+    prepare: function () {
+      var self = this;
+      this.tileLights = []; this.ao = [];
+      for (var y = 0; y < this.h; y++) for (var x = 0; x < this.w; x++) {
+        var t = RPG.db.tiles[this.grid[y][x]];
+        if (!t) continue;
+        if (t.light) this.tileLights.push({ x: x, y: y, r: t.light.r, color: t.light.color });
+        if (!t.solid && !t.tall && y > 0) {
+          var up = RPG.db.tiles[this.grid[y - 1][x]];
+          if (up && up.solid && !up.tall) this.ao.push({ x: x, y: y });
+        }
+      }
+      void self;
     },
 
     // ---- queries ----
@@ -98,7 +116,6 @@
       return Promise.resolve(promise).then(function () { self.busy = false; }, function (e) { self.busy = false; console.error(e); });
     },
 
-    // finished a step: warps, touch events, encounters
     arrived: function () {
       var p = this.player, s = RPG.state, m = this.map, self = this;
       s.x = p.x; s.y = p.y; s.steps++;
@@ -111,8 +128,7 @@
         this.encounterSteps++;
         if (this.encounterSteps > (enc.minSteps || 4) && RPG.chance(enc.rate || 0.08)) {
           this.encounterSteps = 0;
-          var troop = RPG.pickWeighted(enc.troops);
-          this.runBusy(RPG.battle(troop));
+          this.runBusy(RPG.battle(RPG.pickWeighted(enc.troops)));
         }
       }
     },
@@ -136,7 +152,7 @@
       if (ev) this.runBusy(this.runEvent(ev));
     },
     openChest: async function (c) {
-      if (RPG.flag(c.flag)) { await RPG.ui.say('裡面已經空了。'); return; }
+      if (RPG.flag(c.flag)) { await RPG.ui.say(RPG.t('ui.chestEmpty')); return; }
       RPG.setFlag(c.flag);
       if (c.gold) await RPG.run([{ gold: c.gold }]);
       if (c.item) await RPG.run([{ give: c.item, count: c.count || 1 }]);
@@ -144,52 +160,96 @@
 
     // ======================= drawing =======================
     draw: function () {
-      var p = this.player;
-      var camX = RPG.clamp(p.fx * T + T / 2 - RPG.W / 2, 0, Math.max(0, this.w * T - RPG.W));
-      var camY = RPG.clamp(p.fy * T + T / 2 - RPG.H / 2, 0, Math.max(0, this.h * T - RPG.H));
-      if (this.w * T < RPG.W) camX = (this.w * T - RPG.W) / 2;
-      if (this.h * T < RPG.H) camY = (this.h * T - RPG.H) / 2;
+      var fx = RPG.fx.active(), p = this.player, m = this.map;
+      var ww = fx ? Math.ceil(RPG.W * RPG.fx.MARGIN_X) : RPG.W, wh = fx ? RPG.H + RPG.fx.MARGIN_Y : RPG.H;
+      var world = fx ? RPG.fx.beginWorld(ww, wh) : null, g = RPG.ctx;
+      var camX = RPG.clamp(p.fx * T + T / 2 - ww / 2, 0, Math.max(0, this.w * T - ww));
+      var camY = RPG.clamp(p.fy * T + T / 2 - wh / 2, 0, Math.max(0, this.h * T - wh));
+      if (this.w * T < ww) camX = (this.w * T - ww) / 2;
+      if (this.h * T < wh) camY = (this.h * T - wh) / 2;
       camX = Math.round(camX); camY = Math.round(camY);
-      g.fillStyle = this.map.bg || '#000'; g.fillRect(0, 0, RPG.W, RPG.H);
+      g.fillStyle = m.bg || '#000'; g.fillRect(0, 0, ww, wh);
       var x0 = Math.max(0, Math.floor(camX / T)), y0 = Math.max(0, Math.floor(camY / T));
-      var x1 = Math.min(this.w - 1, Math.ceil((camX + RPG.W) / T)), y1 = Math.min(this.h - 1, Math.ceil((camY + RPG.H) / T));
-      var anim = Math.floor(RPG.frame / 30);
-      for (var y = y0; y <= y1; y++) for (var x = x0; x <= x1; x++) {
+      var x1 = Math.min(this.w - 1, Math.ceil((camX + ww) / T)), y1 = Math.min(this.h - 1, Math.ceil((camY + wh) / T) + 2);
+      var anim = Math.floor(RPG.frame / 30), x, y;
+      // ground
+      for (y = y0; y <= y1; y++) for (x = x0; x <= x1; x++) {
         var id = this.grid[y][x];
-        if (id) g.drawImage(RPG.tileImage(id, anim), x * T - camX, y * T - camY);
+        if (id) g.drawImage(RPG.tileImage(id, anim), x * T - camX, y * T - camY, T, T);
       }
-      // things on the map, sorted by row so nearer things are in front
-      var list = [];
-      (this.map.chests || []).forEach(function (c) { list.push({ y: c.y, draw: function () { RPG.drawSprite('chest', c.x * T - camX, c.y * T - camY, { pose: RPG.flag(c.flag) ? 'open' : 'closed' }); } }); });
+      // soft shade where the ground meets a wall
+      this.ao.forEach(function (a) {
+        if (a.x < x0 || a.x > x1 || a.y < y0 || a.y > y1) return;
+        var gx = a.x * T - camX, gy = a.y * T - camY, gr = g.createLinearGradient(0, gy, 0, gy + 6);
+        gr.addColorStop(0, 'rgba(0,0,0,0.28)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = gr; g.fillRect(gx, gy, T, 6);
+      });
+      // things that stand up, sorted by row (characters can walk behind trees)
+      var list = [], self = this;
+      for (y = y0; y <= y1; y++) for (x = x0; x <= x1; x++) {
+        var t = RPG.db.tiles[this.grid[y][x]];
+        if (t && t.tall) (function (tx, ty, tile, tid) {
+          shadow(g, tx * T - camX + 8, ty * T - camY + 13, (tile.tallW || T) * 0.42, 3.5);
+          list.push({ y: ty + 0.5, draw: function () {
+            var img = RPG.tallImage(tid, anim), iw = img.width / 2, ih = img.height / 2;
+            g.drawImage(img, tx * T - camX - (iw - T) / 2, (ty + 1) * T - camY - ih, iw, ih);
+          } });
+        })(x, y, t, this.grid[y][x]);
+      }
+      (m.chests || []).forEach(function (c) {
+        list.push({ y: c.y, draw: function () { shadow(g, c.x * T - camX + 8, c.y * T - camY + 13, 7, 2.5); RPG.drawSprite('chest', c.x * T - camX, c.y * T - camY, { pose: RPG.flag(c.flag) ? 'open' : 'closed' }); } });
+      });
       this.visibleNpcs().forEach(function (n) {
-        list.push({ y: n.fy, draw: function () { drawWalker(n.sprite, n.fx, n.fy, n.dir, n.moving ? Math.floor(n.t / 8) : 0, n.palette, camX, camY); } });
+        list.push({ y: n.fy, draw: function () { walker(g, n.sprite, n.fx, n.fy, n.dir, n.moving ? Math.floor(n.t / 8) : 0, n.palette, camX, camY); } });
       });
       var party = RPG.state.party, trail = this.trail, moving = p.moving, k = p.moving ? p.t / STEP : 1;
       for (var i = party.length - 1; i >= 1; i--) {
-        var a = trail[i] , b = trail[i - 1];
-        var fx = moving ? a.x + (b.x - a.x) * k : b.x, fy = moving ? a.y + (b.y - a.y) * k : b.y;
-        (function (id, fx, fy, dir) {
-          var c = RPG.get('characters', id);
-          list.push({ y: fy - 0.01, draw: function () { drawWalker(c.sprite, fx, fy, dir, moving ? Math.floor(p.t / 4) : 0, c.palette, camX, camY); } });
-        })(party[i], fx, fy, b.dir);
+        var a = trail[i], b = trail[i - 1];
+        var fxp = moving ? a.x + (b.x - a.x) * k : b.x, fyp = moving ? a.y + (b.y - a.y) * k : b.y;
+        (function (cid, px, py, dir) {
+          var c = RPG.get('characters', cid);
+          list.push({ y: py - 0.01, draw: function () { walker(g, c.sprite, px, py, dir, moving ? Math.floor(p.t / 4) : 0, c.palette, camX, camY); } });
+        })(party[i], fxp, fyp, b.dir);
       }
       var lead = RPG.get('characters', party[0]);
-      list.push({ y: p.fy, draw: function () { drawWalker(lead.sprite, p.fx, p.fy, p.dir, p.moving ? Math.floor(p.t / 4) : 0, lead.palette, camX, camY); } });
+      list.push({ y: p.fy, draw: function () { walker(g, lead.sprite, p.fx, p.fy, p.dir, p.moving ? Math.floor(p.t / 4) : 0, lead.palette, camX, camY); } });
       list.sort(function (a, b) { return a.y - b.y; }).forEach(function (e) { e.draw(); });
-      if (this.map.tint) { g.fillStyle = this.map.tint; g.fillRect(0, 0, RPG.W, RPG.H); }
+      if (m.tint) { g.fillStyle = m.tint; g.fillRect(0, 0, ww, wh); }
+
+      if (fx) {
+        RPG.fx.particles(m.particles, camX, camY, ww, wh, RPG.frame);
+        var lights = (m.lights || []).concat(this.tileLights).map(function (l) {
+          return { x: l.x * T + 8 - camX, y: l.y * T + 8 - camY, r: (l.r || 3) * T, color: l.color };
+        });
+        if (m.playerLight) lights.push({ x: p.fx * T + 8 - camX, y: p.fy * T + 4 - camY, r: m.playerLight * T, color: 'rgba(255,210,140,A)' });
+        RPG.fx.lighting(m.ambient || 0, lights, ww, wh);
+        RPG.ctx = RPG.g;
+        RPG.g.setTransform(RPG.scale, 0, 0, RPG.scale, 0, 0);
+        RPG.fx.diorama(world, ww, wh);
+        RPG.fx.post({ dof: true, bloom: m.bloom, grade: m.grade || 'warm', vignette: m.vignette || 0.5 });
+      }
+      RPG.ctx = RPG.g;
+      RPG.g.setTransform(RPG.scale, 0, 0, RPG.scale, 0, 0);
       if (this.bannerT > 0) {
-        g.globalAlpha = Math.min(1, this.bannerT / 30);
-        var w = RPG.textWidth(this.banner, 12, true) + 30;
+        var name = RPG.name('maps', m.id);
+        RPG.g.globalAlpha = Math.min(1, this.bannerT / 30);
+        var w = RPG.textWidth(name, 12, true) + 30;
         RPG.box((RPG.W - w) / 2, 12, w, 24);
-        RPG.text(this.banner, RPG.W / 2, 18, { size: 12, bold: true, align: 'center', color: '#ffd860' });
-        g.globalAlpha = 1;
+        RPG.text(name, RPG.W / 2, 18, { size: 12, bold: true, align: 'center', color: '#ffd860' });
+        RPG.g.globalAlpha = 1;
       }
     }
   };
 
-  function drawWalker(sprite, fx, fy, dir, step, palette, camX, camY) {
-    var pose = dir === 'left' || dir === 'right' ? 'side' : dir;
-    RPG.drawSprite(sprite, Math.round(fx * T - camX), Math.round(fy * T - camY) - 2, { pose: pose, frame: step % 2, palette: palette, flip: dir === 'left' });
+  function shadow(g, cx, cy, rx, ry) {
+    g.save(); g.fillStyle = 'rgba(10,6,20,0.28)';
+    g.beginPath(); g.ellipse(cx + 2, cy, rx, ry, 0, 0, Math.PI * 2); g.fill(); g.restore();
   }
-  RPG.drawWalker = drawWalker;
+  function walker(g, sprite, fx, fy, dir, step, palette, camX, camY) {
+    var pose = dir === 'left' || dir === 'right' ? 'side' : dir;
+    var x = Math.round((fx * T - camX) * 2) / 2, y = Math.round((fy * T - camY) * 2) / 2;
+    shadow(g, x + 8, y + 14, 6, 2.2);
+    RPG.drawSprite(sprite, x, y - 3, { pose: pose, frame: step % 2, palette: palette, flip: dir === 'left' });
+  }
+  RPG.drawWalker = walker;
 })();

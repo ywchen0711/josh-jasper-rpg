@@ -1,14 +1,21 @@
 /*
  * Maps. Each map:
- *   name, rows (one character per tile, see the legend in config.js), legend (extra/override characters)
- *   bg, tint, backdrop (battle background)
+ *   rows (one character per tile, see the legend in config.js), legend (extra/override characters)
+ *   bg, tint, backdrop (battle background)        — the map's name is the text key map.<id>.name
  *   warps:      [{ x, y, to: mapId, tx, ty, dir, if }]
  *   npcs:       [{ id, x, y, sprite, palette, dir, name, wander, solid, showIf, hideIf, script }]
+ *                 name is a speaker key: npc.<name> in js/lang/*.js (or a party member id like 'josh')
  *   events:     [{ x, y, trigger: 'touch' | 'action', if, once: 'flag', script }]
  *   chests:     [{ x, y, item, count, gold, flag }]
  *   encounters: { rate, minSteps, anywhere, if, troops: [[troopId, weight], ...] }
- * Scripts are lists of commands (js/script.js). Conditions: 'flag', '!flag', { item }, { member }, ...
- * Hide an NPC from a script with { hide: 'npcId' }.
+ * Scripts are lists of commands (js/script.js) whose text is keys into js/lang/*.js, e.g. { say: 'home.mom.rest' }.
+ * Conditions: 'flag', '!flag', { item }, { member }, ...   Hide an NPC from a script with { hide: 'npcId' }.
+ *
+ * HD-2D look (all optional, used when effects are on):
+ *   ambient     0..1 darkness, lit by lights      lights: [{ x, y, r (tiles), color: 'rgba(255,200,120,A)' }]
+ *   playerLight radius in tiles of a light that follows the party (caves)
+ *   particles   'leaves' | 'dust' | 'fireflies' | 'motes'
+ *   grade       'warm' | 'cool' | 'dusk' | 'night'      bloom 0..1      vignette 0..1
  */
 (function () {
   'use strict';
@@ -25,11 +32,14 @@
     kidC:      { H: '#1a1a1a', T: '#f0d040', P: '#2a4a2a' },
     oldman:    { H: '#e0e0e0', T: '#8a6a4a', P: '#4a4a4a', G: '#8a6a4a' }
   };
+  var WARM = 'rgba(255,196,120,A)', COOL = 'rgba(140,200,255,A)', SUN = 'rgba(255,236,190,A)';
 
   RPG.add('maps', {
     // ======================= home =======================
     home: {
-      name: '我們家', bg: '#2a1a10', backdrop: 'home',
+      bg: '#2a1a10', backdrop: 'home',
+      ambient: 0.22, particles: 'motes', grade: 'warm', bloom: 0.4,
+      lights: [{ x: 4, y: 1, r: 4, color: SUN }, { x: 11, y: 1, r: 3.5, color: WARM }, { x: 2, y: 4, r: 2.5, color: COOL }, { x: 6, y: 7, r: 3, color: SUN }],
       rows: [
         '##############',
         '#BB==S===KKKK#',
@@ -44,19 +54,20 @@
       warps: [{ x: 6, y: 8, to: 'street', tx: 4, ty: 4, dir: 'down' }],
       chests: [{ x: 12, y: 6, item: 'eraser', flag: 'chest_home' }],
       npcs: [
-        { id: 'mom', x: 11, y: 2, sprite: 'adult', palette: PAL.mom, name: '媽媽', dir: 'left', script: [
-          { if: 'got_trophy', then: [{ say: '獎盃找到了？快拿去給校長！' }], 'else': [{ say: '累了嗎？休息一下再出門吧。' }] },
-          { inn: 0, text: '吃了點心、睡了午覺，大家都恢復精神了！' }
+        { id: 'mom', x: 11, y: 2, sprite: 'adult', palette: PAL.mom, name: 'mom', dir: 'left', script: [
+          { if: 'got_trophy', then: [{ say: 'home.mom.trophy' }], 'else': [{ say: 'home.mom.rest' }] },
+          { inn: 0, text: 'home.mom.rested' }
         ] }
       ],
       events: [
-        { x: 2, y: 4, trigger: 'action', script: [{ say: '電視正在播運動會的新聞：「Sage Canyon 小學的郊狼獎盃……」咦？畫面斷掉了。' }] }
+        { x: 2, y: 4, trigger: 'action', script: [{ say: 'home.tv' }] }
       ]
     },
 
     // ======================= the neighborhood =======================
     street: {
-      name: 'Carmel Valley 社區', bg: '#5c9c48', backdrop: 'street',
+      bg: '#5c9c48', backdrop: 'street',
+      particles: 'leaves', grade: 'warm', bloom: 0.36, vignette: 0.45,
       rows: [
         'TTTTTTTTTTTTTpppTTTTTTTTTTTTTT',
         'T^^^^^^^....TpppT...^^^^^^^..T',
@@ -83,37 +94,38 @@
         { x: 29, y: 6, to: 'school', tx: 1, ty: 8, dir: 'right' }, { x: 29, y: 7, to: 'school', tx: 1, ty: 8, dir: 'right' }, { x: 29, y: 8, to: 'school', tx: 1, ty: 8, dir: 'right' }
       ],
       events: [
-        { x: 23, y: 3, trigger: 'touch', script: [{ say: '鄰居家的門鎖著。門上貼著：「去看運動會了！」' }] },
-        { x: 17, y: 10, trigger: 'action', script: [{ say: '「Sage Canyon 社區公園」　↑ 峽谷步道　→ Sage Canyon 小學' }] }
+        { x: 23, y: 3, trigger: 'touch', script: [{ say: 'street.neighborDoor' }] },
+        { x: 17, y: 10, trigger: 'action', script: [{ say: 'street.sign' }] }
       ],
       chests: [{ x: 1, y: 16, item: 'cookie', count: 2, flag: 'chest_park' }],
       npcs: [
-        { id: 'mochi', x: 20, y: 13, sprite: 'mochi', name: '小狗', wander: 2, hideIf: { member: 'mochi' }, script: [
-          { say: '一隻柴犬小狗在公園裡打轉。項圈上寫著「麻糬」。', name: null },
+        { id: 'mochi', x: 20, y: 13, sprite: 'mochi', name: 'puppy', wander: 2, hideIf: { member: 'mochi' }, script: [
+          { say: 'street.mochi.see', name: null },
           { if: { item: 'cookie' }, then: [
-            { choice: ['給牠一塊餅乾', '摸摸頭就好'], text: '麻糬盯著你的口袋，口水快滴下來了……', then: [
-              [{ take: 'cookie' }, { say: '汪！汪汪！', name: '麻糬' }, { say: '麻糬好像決定要跟著你們了！', name: null },
-               { say: '好耶！牠的主人一定在學校看運動會，我們帶牠一起去！', name: 'Jasper' }, { join: 'mochi' }],
-              [{ say: '麻糬開心地搖尾巴，然後繼續盯著你的口袋。', name: null }]
+            { choice: ['street.mochi.give', 'street.mochi.pet'], text: 'street.mochi.stare', name: null, then: [
+              [{ take: 'cookie' }, { say: 'street.mochi.woof', name: 'mochi' }, { say: 'street.mochi.follows', name: null },
+               { say: 'street.mochi.jasper', name: 'jasper' }, { join: 'mochi' }],
+              [{ say: 'street.mochi.wag', name: null }]
             ] }
-          ], 'else': [{ say: '麻糬聞了聞你的手，好像很餓……要是有點心就好了。', name: null }] }
+          ], 'else': [{ say: 'street.mochi.hungry', name: null }] }
         ] },
-        { id: 'oldman', x: 7, y: 9, sprite: 'adult', palette: PAL.oldman, name: '散步的爺爺', wander: 3, script: [
-          { say: '早安啊小朋友。最近社區常有浣熊翻垃圾桶，晚上都聽到牠們在峽谷那邊吵。' }
+        { id: 'oldman', x: 7, y: 9, sprite: 'adult', palette: PAL.oldman, name: 'oldman', wander: 3, script: [
+          { say: 'street.oldman' }
         ] },
-        { id: 'kid1', x: 25, y: 12, sprite: 'kid', palette: PAL.kidA, name: '鄰居小孩', wander: 2, script: [
-          { say: '你們看到一隻柴犬嗎？牠好像是學校工友伯伯的狗。' },
-          { say: '聽說牠最喜歡巧克力餅乾。' }
+        { id: 'kid1', x: 25, y: 12, sprite: 'kid', palette: PAL.kidA, name: 'neighborKid', wander: 2, script: [
+          { say: ['street.kid.1', 'street.kid.2'] }
         ] },
-        { id: 'jogger', x: 18, y: 15, sprite: 'adult', palette: PAL.kidC, name: '慢跑的叔叔', wander: 4, script: [
-          { say: '峽谷步道的草叢裡有很多小動物，累了要記得吃點東西喔！' }
+        { id: 'jogger', x: 18, y: 15, sprite: 'adult', palette: PAL.kidC, name: 'jogger', wander: 4, script: [
+          { say: 'street.jogger' }
         ] }
       ]
     },
 
     // ======================= the canyon trail =======================
     canyon: {
-      name: 'Sage Canyon 峽谷步道', bg: '#a07850', backdrop: 'canyon',
+      bg: '#a07850', backdrop: 'canyon',
+      particles: 'dust', grade: 'warm', bloom: 0.3, vignette: 0.55,
+      lights: [{ x: 16, y: 17, r: 2, color: 'rgba(120,255,160,A)' }],
       rows: [
         'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
         'CCCCCqCCCCCCCCCCCCCCCCCCCCCCCC',
@@ -152,22 +164,22 @@
         { x: 16, y: 17, trigger: 'action', script: [{ shop: 'vending' }] }
       ],
       npcs: [
-        { id: 'ranger', x: 5, y: 2, sprite: 'adult', palette: PAL.ranger, name: '峽谷管理員', hideIf: 'clue_fur', script: [
-          { if: 'quest', then: [{ say: '洞窟裡住著一群浣熊，很危險。沒有證據的話，我不能讓小朋友進去。' }],
-            'else': [{ say: '前面是浣熊洞窟，小朋友不可以進去喔。' }] }
+        { id: 'ranger', x: 5, y: 2, sprite: 'adult', palette: PAL.ranger, name: 'ranger', hideIf: 'clue_fur', script: [
+          { if: 'quest', then: [{ say: 'canyon.ranger.quest' }], 'else': [{ say: 'canyon.ranger.keepOut' }] }
         ] },
-        { id: 'ranger2', x: 4, y: 3, sprite: 'adult', palette: PAL.ranger, name: '峽谷管理員', showIf: 'clue_fur', script: [
-          { say: '浣熊毛？原來是牠們搞的鬼！洞窟裡面很深，要小心喔。' }
+        { id: 'ranger2', x: 4, y: 3, sprite: 'adult', palette: PAL.ranger, name: 'ranger', showIf: 'clue_fur', script: [
+          { say: 'canyon.ranger.fur' }
         ] },
-        { id: 'hiker', x: 20, y: 10, sprite: 'adult', palette: PAL.kidB, name: '登山客', wander: 2, script: [
-          { say: '草叢裡常常有東西跳出來。打不過的話，用「逃跑」也是一種勇氣！' }
+        { id: 'hiker', x: 20, y: 10, sprite: 'adult', palette: PAL.kidB, name: 'hiker', wander: 2, script: [
+          { say: 'canyon.hiker' }
         ] }
       ]
     },
 
     // ======================= Sage Canyon School =======================
     school: {
-      name: 'Sage Canyon 小學', bg: '#4e4e58', backdrop: 'school',
+      bg: '#4e4e58', backdrop: 'school',
+      particles: 'motes', grade: 'warm', bloom: 0.38, vignette: 0.45,
       rows: [
         'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
         'XxxXxxXxxXXEXXxxXxxXQQQXxxXxxX',
@@ -190,63 +202,57 @@
         { x: 11, y: 1, to: 'library', tx: 11, ty: 14, dir: 'up', 'if': 'quest' }
       ],
       events: [
-        { x: 11, y: 1, trigger: 'touch', 'if': '!quest', script: [{ say: '圖書館的門鎖著。先去跟校長打招呼吧。' }] }
+        { x: 11, y: 1, trigger: 'touch', 'if': '!quest', script: [{ say: 'school.libraryLocked' }] }
       ],
       npcs: [
-        { id: 'principal', x: 13, y: 3, sprite: 'adult', palette: PAL.principal, name: '校長', script: [
+        { id: 'principal', x: 13, y: 3, sprite: 'adult', palette: PAL.principal, name: 'principal', script: [
           { if: 'got_trophy', then: [
-            { say: '這、這是郊狼獎盃！你們找回來了！' },
+            { say: 'school.principal.trophy1' },
             { take: 'trophy' },
-            { say: '原來是浣熊大王把它當成寶物藏起來了啊。哈哈哈，難怪亮晶晶的東西都不見了。' },
-            { say: '各位同學！運動會正式開始！GO COYOTES！' },
+            { say: ['school.principal.trophy2', 'school.principal.trophy3'] },
             { ending: true }
           ], 'else': [
             { if: 'clue_fur', then: [
-              { say: '灰色的毛？這是浣熊的毛吧……峽谷的浣熊洞窟！' },
-              { say: '我已經打電話給管理員了，他會讓你們過去。拜託你們了！' }
+              { say: ['school.principal.fur1', 'school.principal.fur2'] }
             ], 'else': [
               { if: 'quest', then: [
-                { say: '獎盃不見的那天晚上，圖書館裡有奇怪的聲音……拜託你們去看看！' }
+                { say: 'school.principal.remind' }
               ], 'else': [
-                { say: '啊，Josh 和 Jasper！不好了，運動會的冠軍「郊狼獎盃」不見了！' },
-                { say: '沒有獎盃，運動會就沒辦法開始……' },
-                { say: '交給我們！我們一定會把獎盃找回來！', name: 'Josh' },
-                { say: '我昨天晚上看到圖書館的燈一閃一閃的喔。', name: 'Jasper' },
-                { say: '圖書館後面是 STEAM 實驗室……門我幫你們打開了。這個帶著，路上小心！' },
+                { say: ['school.principal.intro1', 'school.principal.intro2'] },
+                { say: 'school.principal.josh', name: 'josh' },
+                { say: 'school.principal.jasper', name: 'jasper' },
+                { say: 'school.principal.intro3' },
                 { give: 'milk', count: 2 },
                 { set: 'quest' }
               ] }
             ] }
           ] }
         ] },
-        { id: 'nurse', x: 3, y: 2, sprite: 'adult', palette: PAL.nurse, name: '保健室阿姨', script: [
-          { say: '跌倒了嗎？來，阿姨幫你們擦藥。' },
-          { inn: 0, text: '擦了藥、喝了水，大家都恢復精神了！' }
+        { id: 'nurse', x: 3, y: 2, sprite: 'adult', palette: PAL.nurse, name: 'nurse', script: [
+          { say: 'school.nurse.hello' },
+          { inn: 0, text: 'school.nurse.rested' }
         ] },
-        { id: 'clerk', x: 21, y: 2, sprite: 'adult', palette: PAL.clerk, name: '福利社阿姨', script: [{ shop: 'schoolStore' }] },
-        { id: 'coach', x: 15, y: 12, sprite: 'adult', palette: PAL.coach, name: 'Coach', script: [
-          { say: '沒有獎盃，比賽開不了！你們要去找獎盃的話，先來器材室挑裝備！' },
+        { id: 'clerk', x: 21, y: 2, sprite: 'adult', palette: PAL.clerk, name: 'clerk', script: [{ shop: 'schoolStore' }] },
+        { id: 'coach', x: 15, y: 12, sprite: 'adult', palette: PAL.coach, name: 'coach', script: [
+          { say: 'school.coach' },
           { shop: 'coachShed' }
         ] },
-        { id: 'mascot', x: 26, y: 5, sprite: 'coyote', name: '郊狼吉祥物', wander: 2, script: [
-          { say: '（穿著郊狼布偶裝的學長對你們比了一個讚。）' },
-          { if: 'got_trophy', then: [{ say: 'GO COYOTES！！' }], 'else': [{ say: '「獎盃不見了，我連加油舞都跳不起來……」' }] }
+        { id: 'mascot', x: 26, y: 5, sprite: 'coyote', name: 'mascot', wander: 2, script: [
+          { say: 'school.mascot.thumbs', name: null },
+          { if: 'got_trophy', then: [{ say: 'school.mascot.go' }], 'else': [{ say: 'school.mascot.sad' }] }
         ] },
-        { id: 'kidA', x: 6, y: 5, sprite: 'kid', palette: PAL.kidA, name: '同學 Leo', wander: 2, script: [
-          { say: '我聽說 STEAM 實驗室的掃地機器人最近怪怪的，一直在吸奇怪的東西。' }
-        ] },
-        { id: 'kidB', x: 24, y: 7, sprite: 'kid', palette: PAL.kidB, name: '同學 Mia', wander: 2, script: [
-          { say: '躲避球比賽我一定要贏！Josh 你不要手下留情喔。' }
-        ] },
-        { id: 'kidC', x: 9, y: 12, sprite: 'kid', palette: PAL.kidC, name: '同學 Ethan', wander: 3, script: [
-          { say: '你知道嗎？用水攻擊機器人的話，它們會短路喔！' }
-        ] }
+        { id: 'kidA', x: 6, y: 5, sprite: 'kid', palette: PAL.kidA, name: 'leo', wander: 2, script: [{ say: 'school.leo' }] },
+        { id: 'kidB', x: 24, y: 7, sprite: 'kid', palette: PAL.kidB, name: 'mia', wander: 2, script: [{ say: 'school.mia' }] },
+        { id: 'kidC', x: 9, y: 12, sprite: 'kid', palette: PAL.kidC, name: 'ethan', wander: 3, script: [{ say: 'school.ethan' }] }
       ]
     },
 
     // ======================= library & STEAM lab =======================
     library: {
-      name: '圖書館・STEAM 實驗室', bg: '#1a2a2a', backdrop: 'library',
+      bg: '#1a2a2a', backdrop: 'library',
+      ambient: 0.32, particles: 'dust', grade: 'cool', bloom: 0.5, vignette: 0.6,
+      lights: [{ x: 11.5, y: 14, r: 4, color: SUN }, { x: 4, y: 9, r: 3, color: WARM }, { x: 19, y: 11, r: 3, color: WARM },
+               { x: 6, y: 3, r: 3.5, color: COOL }, { x: 17, y: 3, r: 3.5, color: COOL }, { x: 21, y: 14, r: 2.5, color: WARM }],
       rows: [
         'ZZZZZZZZZZZZZZZZZZZZZZZZ',
         'ZmmmmMmmmmmmmmmmmmMmmmmZ',
@@ -273,20 +279,19 @@
         { x: 22, y: 1, item: 'waterGun', flag: 'chest_lib3' }
       ],
       npcs: [
-        { id: 'librarian', x: 21, y: 14, sprite: 'adult', palette: PAL.librarian, name: '圖書館阿姨', script: [
-          { say: '噓——圖書館要安靜。最近書本會自己飛來飛去，好可怕……' },
-          { say: '實驗室在裡面。要不要在這裡先休息一下？' },
-          { inn: 0, text: '在安靜的閱讀角休息了一下，大家都恢復精神了！' }
+        { id: 'librarian', x: 21, y: 14, sprite: 'adult', palette: PAL.librarian, name: 'librarian', script: [
+          { say: ['library.librarian.shh', 'library.librarian.rest'] },
+          { inn: 0, text: 'library.librarian.rested' }
         ] },
-        { id: 'robomax', x: 11, y: 1, sprite: 'robovac', palette: { M: '#c8a040', G: '#7a5a20' }, name: '掃地機器人 MAX', hideIf: 'robomax_done', script: [
-          { say: '嗶——嗶——發現……髒東西。', name: '掃地機器人 MAX' },
-          { say: '它的集塵盒裡卡著一團灰色的毛！', name: 'Jasper' },
+        { id: 'robomax', x: 11, y: 1, sprite: 'robovac', palette: { M: '#c8a040', G: '#7a5a20' }, name: 'robomax', hideIf: 'robomax_done', script: [
+          { say: 'library.robomax.beep' },
+          { say: 'library.robomax.jasper', name: 'jasper' },
           { battle: 'robomax', win: [
             { set: 'robomax_done' },
-            { say: '機器人冒著煙停了下來，集塵盒「喀」一聲打開了。', name: null },
+            { say: 'library.robomax.stops', name: null },
             { give: 'fur' },
-            { say: '是灰色的毛……還有一點垃圾的味道。浣熊？', name: 'Josh' },
-            { say: '那天晚上一定是浣熊溜進學校，機器人追著牠吸了一口毛！快拿去給校長看！', name: 'Jasper' },
+            { say: 'library.robomax.josh', name: 'josh' },
+            { say: 'library.robomax.jasper2', name: 'jasper' },
             { set: 'clue_fur' }
           ] }
         ] }
@@ -295,7 +300,11 @@
 
     // ======================= the raccoon cave =======================
     cave: {
-      name: '浣熊洞窟', bg: '#0a0806', tint: 'rgba(10,6,0,0.18)', backdrop: 'cave',
+      bg: '#0a0806', tint: 'rgba(10,6,0,0.18)', backdrop: 'cave',
+      ambient: 0.62, playerLight: 4.2, particles: 'fireflies', grade: 'night', bloom: 0.6, vignette: 0.7,
+      lights: [{ x: 11.5, y: 11, r: 4, color: 'rgba(255,220,170,A)' }, { x: 19, y: 1, r: 3.5, color: 'rgba(255,214,90,A)' },
+               { x: 3, y: 2, r: 2.2, color: 'rgba(120,255,200,A)' }, { x: 20, y: 2, r: 2.2, color: 'rgba(120,255,200,A)' },
+               { x: 2, y: 10, r: 2, color: 'rgba(160,140,255,A)' }, { x: 21, y: 10, r: 2, color: 'rgba(160,140,255,A)' }],
       rows: [
         'WWWWWWWWWWWWWWWWWWWWWWWW',
         'WWqqqqqqWWWWWWWWqqqqqqWW',
@@ -319,17 +328,17 @@
         { x: 2, y: 1, item: 'sticker', count: 2, flag: 'chest_cave3' }
       ],
       npcs: [
-        { id: 'king', x: 19, y: 1, sprite: 'king', name: '浣熊大王', hideIf: 'got_trophy', script: [
-          { say: '誰！誰敢闖進本大王的寶物庫！', name: '浣熊大王' },
-          { say: '那個獎盃是學校的！快還來！', name: 'Josh' },
-          { say: '亮晶晶的東西都是本大王的！想要的話，就打贏我吧！', name: '浣熊大王' },
+        { id: 'king', x: 19, y: 1, sprite: 'king', name: 'king', hideIf: 'got_trophy', script: [
+          { say: 'cave.king.who' },
+          { say: 'cave.king.josh', name: 'josh' },
+          { say: 'cave.king.shiny' },
           { battle: 'raccoonKing', win: [
-            { say: '嗚嗚……好啦好啦，還給你們。本大王只是想要一個亮晶晶的東西……', name: '浣熊大王' },
-            { say: '那……運動會結束後，我們把參加獎的獎牌送你好不好？', name: 'Jasper' },
-            { say: '真、真的嗎！成交！', name: '浣熊大王' },
+            { say: 'cave.king.give' },
+            { say: 'cave.king.jasper', name: 'jasper' },
+            { say: 'cave.king.deal' },
             { give: 'trophy' },
             { set: 'got_trophy' },
-            { say: '拿回獎盃了！快回學校交給校長！', name: 'Josh' }
+            { say: 'cave.king.josh2', name: 'josh' }
           ] }
         ] }
       ]

@@ -124,7 +124,7 @@
         RPG.box(x, y, w, h);
         var ty = y + 6;
         if (o.title) { RPG.text(o.title, x + w / 2, ty, { size: 10, bold: true, align: 'center', color: '#ffd860' }); ty += 16; }
-        if (!items.length) RPG.text(o.empty || '（沒有東西）', x + 12, ty + 2, { size: 11, color: '#9098b0' });
+        if (!items.length) RPG.text(o.empty || RPG.t('ui.empty'), x + 12, ty + 2, { size: 11, color: '#9098b0' });
         for (var i = top; i < Math.min(items.length, top + rows); i++) {
           var it = items[i], yy = ty + (i - top) * lh;
           if (i === idx) { g.fillStyle = 'rgba(255,255,255,0.12)'; g.fillRect(x + 6, yy - 1, w - 12, lh); RPG.cursor(x + 6, yy + 3); }

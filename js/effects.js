@@ -17,7 +17,7 @@
     (b.status || []).forEach(function (s) { var d = RPG.db.statuses[s.id]; if (d && d.stats && d.stats[key]) mult *= d.stats[key]; });
     return Math.max(0, Math.round(base * mult));
   };
-  RPG.nameOf = function (b) { return b.isEnemy ? b.name : RPG.get('characters', b.id).name; };
+  RPG.nameOf = function (b) { return b.isEnemy ? b.name : RPG.name('characters', b.id); };
   RPG.alive = function (b) { return b.hp > 0; };
   RPG.hasStatus = function (b, id) { return (b.status || []).some(function (s) { return s.id === id; }); };
 
@@ -60,7 +60,7 @@
     }
     var r = RPG.damageFor(ctx.user, t, eff);
     RPG.hurt(t, r.amount);
-    ctx.pop(t, String(r.amount), r.crit ? '#ffd040' : t.isEnemy ? '#ffffff' : '#ff8080', r.crit ? '會心一擊！' : r.weak ? '效果超好！' : r.resist ? '不太有效…' : null);
+    ctx.pop(t, String(r.amount), r.crit ? '#ffd040' : t.isEnemy ? '#ffffff' : '#ff8080', r.crit ? RPG.t('battle.crit') : r.weak ? RPG.t('battle.weak') : r.resist ? RPG.t('battle.resist') : null);
     RPG.sfx(r.crit ? 'crit' : 'hit');
     if (ctx.battle) ctx.battle.shake(t);
   };
@@ -92,31 +92,31 @@
     if (RPG.alive(t)) return;
     t.hp = Math.max(1, Math.round(maxHp(t) * (eff.percent || 0.3)));
     t.status = [];
-    ctx.pop(t, '復活！', '#ffe080');
+    ctx.pop(t, RPG.t('battle.revived'), '#ffe080');
     RPG.sfx('heal');
   };
   E.status = function (eff, ctx) {
     var t = ctx.target, d = RPG.get('statuses', eff.status);
     if (!RPG.alive(t)) return;
     var immune = t.isEnemy && (t.def.immune || []).indexOf(eff.status) >= 0;
-    if (immune || Math.random() > (eff.chance == null ? 1 : eff.chance)) { if (eff.chance != null) ctx.pop(t, '沒中', '#c0c0c0'); return; }
+    if (immune || Math.random() > (eff.chance == null ? 1 : eff.chance)) { if (eff.chance != null) ctx.pop(t, RPG.t('battle.missed'), '#c0c0c0'); return; }
     t.status = (t.status || []).filter(function (s) { return s.id !== eff.status; });
     var turns = eff.turns || (Array.isArray(d.turns) ? RPG.ri(d.turns[0], d.turns[1]) : d.turns || 3);
     t.status.push({ id: eff.status, turns: turns });
-    ctx.pop(t, d.name, d.color || '#e0a0ff');
+    ctx.pop(t, RPG.name('statuses', eff.status), d.color || '#e0a0ff');
   };
   E.cure = function (eff, ctx) {
     var t = ctx.target, list = eff.status === 'all' || !eff.status ? null : [].concat(eff.status);
     var had = (t.status || []).length;
     t.status = (t.status || []).filter(function (s) { return list && list.indexOf(s.id) < 0; });
-    if (had !== t.status.length) ctx.pop(t, '恢復正常', '#a0ffe0');
+    if (had !== t.status.length) ctx.pop(t, RPG.t('battle.cured'), '#a0ffe0');
   };
   E.buff = function (eff, ctx) {
     var t = ctx.target;
     if (!RPG.alive(t)) return;
     t.buffs = (t.buffs || []).filter(function (b) { return b.stat !== eff.stat; });
     t.buffs.push({ stat: eff.stat, mult: eff.mult, turns: eff.turns || 3 });
-    ctx.pop(t, RPG.STAT_NAMES[eff.stat] + (eff.mult >= 1 ? '↑' : '↓'), eff.mult >= 1 ? '#ffd060' : '#80a0ff');
+    ctx.pop(t, RPG.statName(eff.stat) + (eff.mult >= 1 ? '↑' : '↓'), eff.mult >= 1 ? '#ffd060' : '#80a0ff');
   };
   E.escape = function (eff, ctx) { if (ctx.battle) ctx.battle.forceEscape = true; };
   E.custom = function (eff, ctx) { if (eff.run) eff.run(ctx); };
