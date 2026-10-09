@@ -30,6 +30,8 @@
     kidA:      { H: '#2a1a10', T: '#4a9ad8', P: '#3a3a4a' },
     kidB:      { H: '#c89040', T: '#e05a8a', P: '#5a3a6a' },
     kidC:      { H: '#1a1a1a', T: '#f0d040', P: '#2a4a2a' },
+    hiker:     { H: '#3a2a1a', T: '#40a080', P: '#6a5a3a', G: '#e0a040' },
+    truck:     { H: '#ffffff', h: '#6a3a1a', T: '#ff9ac0', P: '#5a8ad8' },
     oldman:    { H: '#e0e0e0', T: '#8a6a4a', P: '#4a4a4a', G: '#8a6a4a' },
     guard:     { H: '#3a2a1a', T: '#f0e040', P: '#3a3a5a', G: '#f0e040' }
   };
@@ -55,7 +57,7 @@
       warps: [{ x: 6, y: 8, to: 'street', tx: 20, ty: 10, dir: 'down' }],
       chests: [{ x: 12, y: 6, item: 'eraser', flag: 'chest_home' }],
       npcs: [
-        { id: 'mom', x: 11, y: 2, sprite: 'adult', palette: PAL.mom, name: 'mom', dir: 'left', script: [
+        { id: 'mom', x: 11, y: 2, sprite: 'mom', name: 'mom', dir: 'left', script: [
           { if: 'got_trophy', then: [{ say: 'home.mom.trophy' }], 'else': [{ say: 'home.mom.rest' }] },
           { inn: 0, text: 'home.mom.rested' }
         ] }
@@ -125,7 +127,7 @@
         { x: 32, y: 0, to: 'canyon', tx: 13, ty: 19, dir: 'up' }, { x: 33, y: 0, to: 'canyon', tx: 14, ty: 19, dir: 'up' }, { x: 34, y: 0, to: 'canyon', tx: 14, ty: 19, dir: 'up' },
         { x: 32, y: 26, to: 'school', tx: 1, ty: 8, dir: 'right' }
       ],
-      encounters: { rate: 0.07, troops: [['lizard', 4], ['lizards', 2], ['bees', 1]] },      // only in the tall grass of the open space
+      encounters: { rate: 0.07, troops: [['squirrels', 3], ['lizard', 3], ['parkMix', 2], ['lizards', 1]] },      // only in the tall grass of the open space
       events: [
         { x: 24, y: 9, trigger: 'touch', script: [{ say: 'street.neighborDoor' }] },
         { x: 12, y: 25, trigger: 'touch', script: [{ say: 'street.restroom' }] },
@@ -147,7 +149,7 @@
             ] }
           ], 'else': [{ say: 'street.mochi.hungry', name: null }] }
         ] },
-        { id: 'oldman', x: 30, y: 13, sprite: 'adult', palette: PAL.oldman, name: 'oldman', wander: 3, script: [
+        { id: 'oldman', x: 30, y: 13, sprite: 'oldman', name: 'oldman', wander: 3, script: [
           { say: 'street.oldman' }
         ] },
         { id: 'kid1', x: 26, y: 13, sprite: 'kid', palette: PAL.kidA, name: 'neighborKid', wander: 2, script: [
@@ -156,7 +158,10 @@
         { id: 'jogger', x: 25, y: 24, sprite: 'adult', palette: PAL.kidC, name: 'jogger', wander: 4, script: [
           { say: 'street.jogger' }
         ] },
-        { id: 'guard', x: 15, y: 24, sprite: 'adult', palette: PAL.guard, name: 'guard', script: [
+        { id: 'iceCream', x: 19, y: 29, sprite: 'capAdult', palette: PAL.truck, name: 'iceCream', script: [
+          { say: 'street.iceCream' }, { shop: 'iceCreamTruck' }
+        ] },
+        { id: 'guard', x: 15, y: 24, sprite: 'capAdult', palette: PAL.guard, name: 'guard', script: [
           { say: 'street.guard' }
         ] }
       ]
@@ -193,25 +198,32 @@
       legend: { 'q': 'caveFloor' },
       warps: [
         { x: 14, y: 20, to: 'street', tx: 33, ty: 1, dir: 'down' },
-        { x: 5, y: 1, to: 'cave', tx: 11, ty: 10, dir: 'up' }
+        { x: 5, y: 1, to: 'cave', tx: 11, ty: 10, dir: 'up', 'if': { item: 'flashlight' } }
       ],
-      encounters: { rate: 0.12, troops: [['lizard', 4], ['lizards', 3], ['gull', 3], ['bees', 2], ['crows', 1], ['canyonMix', 1]] },
+      encounters: { rate: 0.12, troops: [['lizards', 3], ['runners', 3], ['tumbles', 2], ['rattlers', 2], ['gull', 2], ['bees', 2], ['crows', 1], ['canyonMix', 1]] },
       chests: [
         { x: 26, y: 3, item: 'juice', flag: 'chest_canyon1' },
         { x: 1, y: 10, item: 'sneakers', flag: 'chest_canyon2' },
         { x: 27, y: 15, gold: 40, flag: 'chest_canyon3' }
       ],
       events: [
-        { x: 16, y: 17, trigger: 'action', script: [{ shop: 'vending' }] }
+        { x: 16, y: 17, trigger: 'action', script: [{ shop: 'vending' }] },
+        { x: 5, y: 1, trigger: 'touch', 'if': function () { return !RPG.itemCount('flashlight'); }, script: [{ say: 'canyon.tooDark' }] }
       ],
       npcs: [
-        { id: 'ranger', x: 5, y: 2, sprite: 'adult', palette: PAL.ranger, name: 'ranger', hideIf: 'clue_fur', script: [
+        { id: 'ranger', x: 5, y: 2, sprite: 'capAdult', palette: PAL.ranger, name: 'ranger', hideIf: 'clue_fur', script: [
           { if: 'quest', then: [{ say: 'canyon.ranger.quest' }], 'else': [{ say: 'canyon.ranger.keepOut' }] }
         ] },
-        { id: 'ranger2', x: 4, y: 3, sprite: 'adult', palette: PAL.ranger, name: 'ranger', showIf: 'clue_fur', script: [
+        { id: 'ranger2', x: 4, y: 3, sprite: 'capAdult', palette: PAL.ranger, name: 'ranger', showIf: 'clue_fur', script: [
           { say: 'canyon.ranger.fur' }
         ] },
-        { id: 'hiker', x: 20, y: 10, sprite: 'adult', palette: PAL.kidB, name: 'hiker', wander: 2, script: [
+        { id: 'bigGull', x: 26, y: 16, sprite: 'bigGull', name: 'bigGull', hideIf: 'gull_done', script: [
+          { say: 'canyon.gull.hey' },
+          { say: 'canyon.gull.mia', name: 'mia', 'if': { member: 'mia' } },
+          { say: 'canyon.gull.fight' },
+          { battle: 'bigGull', win: [{ set: 'gull_done' }, { say: 'canyon.gull.lost' }] }
+        ] },
+        { id: 'hiker', x: 20, y: 10, sprite: 'kidGirl', palette: PAL.hiker, name: 'hiker', wander: 2, script: [
           { say: 'canyon.hiker' }
         ] }
       ]
@@ -246,7 +258,7 @@
         { x: 11, y: 1, trigger: 'touch', 'if': '!quest', script: [{ say: 'school.libraryLocked' }] }
       ],
       npcs: [
-        { id: 'principal', x: 13, y: 3, sprite: 'adult', palette: PAL.principal, name: 'principal', script: [
+        { id: 'principal', x: 13, y: 3, sprite: 'principal', name: 'principal', script: [
           { if: 'got_trophy', then: [
             { say: 'school.principal.trophy1' },
             { take: 'trophy' },
@@ -269,12 +281,12 @@
             ] }
           ] }
         ] },
-        { id: 'nurse', x: 3, y: 2, sprite: 'adult', palette: PAL.nurse, name: 'nurse', script: [
+        { id: 'nurse', x: 3, y: 2, sprite: 'nurse', name: 'nurse', script: [
           { say: 'school.nurse.hello' },
           { inn: 0, text: 'school.nurse.rested' }
         ] },
         { id: 'clerk', x: 21, y: 2, sprite: 'adult', palette: PAL.clerk, name: 'clerk', script: [{ shop: 'schoolStore' }] },
-        { id: 'coach', x: 15, y: 12, sprite: 'adult', palette: PAL.coach, name: 'coach', script: [
+        { id: 'coach', x: 15, y: 12, sprite: 'capAdult', palette: PAL.coach, name: 'coach', script: [
           { say: 'school.coach' },
           { shop: 'coachShed' }
         ] },
@@ -283,8 +295,17 @@
           { if: 'got_trophy', then: [{ say: 'school.mascot.go' }], 'else': [{ say: 'school.mascot.sad' }] }
         ] },
         { id: 'kidA', x: 6, y: 5, sprite: 'kid', palette: PAL.kidA, name: 'leo', wander: 2, script: [{ say: 'school.leo' }] },
-        { id: 'kidB', x: 24, y: 7, sprite: 'kid', palette: PAL.kidB, name: 'mia', wander: 2, script: [{ say: 'school.mia' }] },
-        { id: 'kidC', x: 9, y: 12, sprite: 'kid', palette: PAL.kidC, name: 'ethan', wander: 3, script: [{ say: 'school.ethan' }] }
+        { id: 'miaNpc', x: 20, y: 12, sprite: 'mia', name: 'mia', wander: 2, hideIf: { member: 'mia' }, script: [
+          { if: 'quest', then: [
+            { say: ['school.mia.join1', 'school.mia.join2'] },
+            { say: 'school.mia.josh', name: 'josh' },
+            { say: 'school.mia.join3' },
+            { join: 'mia' }
+          ], 'else': [{ say: 'school.mia.practice' }] }
+        ] },
+        { id: 'kidC', x: 9, y: 12, sprite: 'kidGirl', palette: PAL.kidC, name: 'ava', wander: 3, script: [
+          { if: 'clue_fur', then: [{ say: 'school.ava.gull' }], 'else': [{ say: 'school.ava.hi' }] }
+        ] }
       ]
     },
 
@@ -313,14 +334,14 @@
         'ZZZZZZZZZZZaaZZZZZZZZZZZ'
       ],
       warps: [{ x: 11, y: 15, to: 'school', tx: 11, ty: 2, dir: 'down' }, { x: 12, y: 15, to: 'school', tx: 11, ty: 2, dir: 'down' }],
-      encounters: { rate: 0.09, anywhere: true, 'if': '!robomax_done', troops: [['homework', 4], ['books', 3], ['clocks', 2], ['slimes', 2], ['robo', 2]] },
+      encounters: { rate: 0.09, anywhere: true, 'if': '!robomax_done', troops: [['homework', 3], ['pencils', 3], ['books', 2], ['clocks', 2], ['slimes', 2], ['beakers', 2], ['robo', 2]] },
       chests: [
         { x: 22, y: 9, item: 'magicPencil', flag: 'chest_lib1' },
         { x: 1, y: 3, item: 'milk', count: 2, flag: 'chest_lib2' },
         { x: 22, y: 1, item: 'waterGun', flag: 'chest_lib3' }
       ],
       npcs: [
-        { id: 'librarian', x: 21, y: 14, sprite: 'adult', palette: PAL.librarian, name: 'librarian', script: [
+        { id: 'librarian', x: 21, y: 14, sprite: 'librarian', name: 'librarian', script: [
           { say: ['library.librarian.shh', 'library.librarian.rest'] },
           { inn: 0, text: 'library.librarian.rested' }
         ] },
@@ -333,8 +354,17 @@
             { give: 'fur' },
             { say: 'library.robomax.josh', name: 'josh' },
             { say: 'library.robomax.jasper2', name: 'jasper' },
-            { set: 'clue_fur' }
+            { set: 'clue_fur' },
+            { say: 'library.ethan.out', name: 'ethan' },
+            { say: 'library.ethan.thanks', name: 'ethan' },
+            { say: 'library.ethan.jasper', name: 'jasper' },
+            { say: 'library.ethan.join', name: 'ethan' },
+            { give: 'flashlight' },
+            { join: 'ethan' }
           ] }
+        ] },
+        { id: 'ethanNpc', x: 5, y: 3, sprite: 'ethan', name: 'ethan', hideIf: 'robomax_done', script: [
+          { say: ['library.ethan.hide1', 'library.ethan.hide2'] }
         ] }
       ]
     },
@@ -347,7 +377,7 @@
                { x: 3, y: 2, r: 2.2, color: 'rgba(120,255,200,A)' }, { x: 20, y: 2, r: 2.2, color: 'rgba(120,255,200,A)' },
                { x: 2, y: 10, r: 2, color: 'rgba(160,140,255,A)' }, { x: 21, y: 10, r: 2, color: 'rgba(160,140,255,A)' }],
       rows: [
-        'WWWWWWWWWWWWWWWWWWWWWWWW',
+        'WWWWWWWWWWWWWWWWWWWqWWWW',
         'WWqqqqqqWWWWWWWWqqqqqqWW',
         'WqqtqqqqqWWWWWWqqqqqtqqW',
         'WqqqqqqqqqqqqqqqqqqqqqqW',
@@ -361,15 +391,49 @@
         'WWWWWWWWWWWqqWWWWWWWWWWW',
         'WWWWWWWWWWWqqWWWWWWWWWWW'
       ],
-      warps: [{ x: 11, y: 12, to: 'canyon', tx: 5, ty: 3, dir: 'down' }, { x: 12, y: 12, to: 'canyon', tx: 5, ty: 3, dir: 'down' }],
-      encounters: { rate: 0.1, anywhere: true, troops: [['raccoons', 3], ['bats', 3], ['caveMix', 3]] },
+      warps: [{ x: 11, y: 12, to: 'canyon', tx: 5, ty: 3, dir: 'down' }, { x: 12, y: 12, to: 'canyon', tx: 5, ty: 3, dir: 'down' },
+              { x: 19, y: 0, to: 'cave2', tx: 9, ty: 9, dir: 'up' }],
+      encounters: { rate: 0.1, anywhere: true, troops: [['raccoons', 3], ['bats', 2], ['caveMix', 3], ['mushrooms', 2], ['possums', 2]] },
       chests: [
         { x: 1, y: 7, item: 'bento', flag: 'chest_cave1' },
         { x: 22, y: 7, item: 'bat', flag: 'chest_cave2' },
         { x: 2, y: 1, item: 'sticker', count: 2, flag: 'chest_cave3' }
       ],
       npcs: [
-        { id: 'king', x: 19, y: 1, sprite: 'king', name: 'king', hideIf: 'got_trophy', script: [
+        { id: 'guards', x: 19, y: 1, sprite: 'raccoonGuard', name: 'guards', hideIf: 'guards_done', script: [
+          { say: 'cave.guards.halt' },
+          { say: 'cave.guards.ethan', name: 'ethan', 'if': { member: 'ethan' } },
+          { say: 'cave.guards.fight' },
+          { battle: 'guards', win: [{ set: 'guards_done' }, { say: 'cave.guards.lost' }] }
+        ] }
+      ]
+    },
+
+    // ======================= the raccoon king's throne room =======================
+    cave2: {
+      bg: '#0a0806', backdrop: 'cave',
+      ambient: 0.5, playerLight: 3.5, particles: 'motes', grade: 'night', bloom: 0.65, vignette: 0.7,
+      lights: [{ x: 10, y: 2, r: 4.5, color: 'rgba(255,214,90,A)' }, { x: 9.5, y: 9, r: 3, color: 'rgba(255,220,170,A)' }],
+      rows: [
+        'WWWWWWWWWWWWWWWWWWWW',
+        'WWWtqqqqqqqqqqqqtWWW',
+        'WWqqqqqqqqqqqqqqqqWW',
+        'WtqqqqqqquuqqqqqqqtW',
+        'WqqqqqqqquuqqqqqqqqW',
+        'WqqqqqqqquuqqqqqqqqW',
+        'WWqqqqqqquuqqqqqqqWW',
+        'WWWqqqqqquuqqqqqqWWW',
+        'WWWWWWWqquuqqWWWWWWW',
+        'WWWWWWWWWuuWWWWWWWWW',
+        'WWWWWWWWWqqWWWWWWWWW'
+      ],
+      warps: [{ x: 9, y: 10, to: 'cave', tx: 19, ty: 1, dir: 'down' }, { x: 10, y: 10, to: 'cave', tx: 19, ty: 1, dir: 'down' }],
+      chests: [
+        { x: 2, y: 4, item: 'friendBracelet', flag: 'chest_throne1' },
+        { x: 17, y: 4, item: 'bobaTea', count: 2, flag: 'chest_throne2' }
+      ],
+      npcs: [
+        { id: 'king', x: 10, y: 2, sprite: 'king', name: 'king', hideIf: 'got_trophy', script: [
           { say: 'cave.king.who' },
           { say: 'cave.king.josh', name: 'josh' },
           { say: 'cave.king.shiny' },
@@ -377,6 +441,7 @@
             { say: 'cave.king.give' },
             { say: 'cave.king.jasper', name: 'jasper' },
             { say: 'cave.king.deal' },
+            { say: 'cave.king.mochi', name: 'mochi', 'if': { member: 'mochi' } },
             { give: 'trophy' },
             { set: 'got_trophy' },
             { say: 'cave.king.josh2', name: 'josh' }

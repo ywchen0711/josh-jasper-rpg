@@ -21,7 +21,7 @@
       var s = RPG.state;
       this.player = { x: s.x, y: s.y, fx: s.x, fy: s.y, dir: s.dir || 'down', t: 0, moving: false, from: null };
       this.trail = [];
-      for (var i = 0; i < 4; i++) this.trail.push({ x: s.x, y: s.y, dir: s.dir });
+      for (var i = 0; i < 8; i++) this.trail.push({ x: s.x, y: s.y, dir: s.dir });
       this.npcs = (m.npcs || []).map(function (n) { return Object.assign({ x0: n.x, y0: n.y, fx: n.x, fy: n.y, dir: n.dir || 'down', t: 0, wanderT: RPG.ri(60, 180) }, n); });
       this.busy = false;
       this.bannerT = 150;
@@ -86,7 +86,7 @@
       p.dir = dir; RPG.state.dir = dir;
       var nx = p.x + DIRS[dir][0], ny = p.y + DIRS[dir][1];
       if (this.blocked(nx, ny)) return;
-      this.trail.unshift({ x: p.x, y: p.y, dir: dir }); this.trail.length = 4;
+      this.trail.unshift({ x: p.x, y: p.y, dir: dir }); this.trail.length = 8;
       p.from = { x: p.x, y: p.y }; p.x = nx; p.y = ny; p.t = 0; p.moving = true;
     },
 

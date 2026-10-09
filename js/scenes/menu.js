@@ -4,18 +4,22 @@
 (function () {
   'use strict';
 
-  function partyPanel(x, y, highlight) {
+  // the height of one member's row, so up to 6 fit on the screen
+  function rowH() { var n = RPG.state.party.length; return n > 5 ? 38 : n > 4 ? 45 : 46; }
+  function partyPanel(x, y, highlight, marked) {
+    var rh = rowH();
     RPG.party().forEach(function (m, i) {
-      var c = RPG.get('characters', m.id), st = RPG.stats(m), yy = y + i * 46;
-      RPG.box(x, yy, 220, 42, { fill: highlight === i ? 'rgba(52,96,170,0.96)' : undefined });
-      RPG.drawSprite(c.sprite, x + 8, yy + 11, { pose: 'down', palette: c.palette });
-      RPG.text(RPG.name('characters', m.id), x + 30, yy + 6, { size: 11, bold: true });
-      RPG.text('Lv ' + m.level, x + 30, yy + 22, { size: 10, color: '#c8d0e8' });
-      RPG.text('HP', x + 82, yy + 6, { size: 9, color: '#a0b0d0' }); RPG.bar(x + 98, yy + 10, 80, 4, m.hp / st.maxHp, '#60e080');
-      RPG.text(m.hp + '/' + st.maxHp, x + 212, yy + 5, { size: 9, align: 'right' });
-      RPG.text('MP', x + 82, yy + 22, { size: 9, color: '#a0b0d0' }); RPG.bar(x + 98, yy + 26, 80, 4, st.maxMp ? m.mp / st.maxMp : 0, '#60a0ff');
-      RPG.text(m.mp + '/' + st.maxMp, x + 212, yy + 21, { size: 9, align: 'right' });
-      if ((m.status || []).length) RPG.text(m.status.map(function (s) { return RPG.textOf('statuses', s.id, 'short'); }).join(''), x + 56, yy + 22, { size: 9, color: '#e0a0ff' });
+      var c = RPG.get('characters', m.id), st = RPG.stats(m), yy = y + i * rh, reserve = RPG.isReserve(m);
+      RPG.box(x, yy, 220, rh - 4, { fill: marked === i ? 'rgba(170,80,130,0.96)' : highlight === i ? 'rgba(80,96,190,0.96)' : reserve ? 'rgba(48,46,80,0.93)' : undefined, sparkle: false });
+      var my = yy + (rh - 4) / 2 - 8;
+      RPG.drawSprite(c.sprite, x + 8, my, { pose: 'down', palette: c.palette, frame: highlight === i ? Math.floor(RPG.frame / 14) % 2 : 0 });
+      RPG.text(RPG.name('characters', m.id), x + 30, my - 1, { size: 11, bold: true, color: reserve ? '#c8c4dc' : undefined });
+      RPG.text('Lv ' + m.level + (reserve ? '  ' + RPG.t('ui.reserve') : ''), x + 30, my + 13, { size: 9, color: reserve ? '#a8a0c8' : '#c8d0e8' });
+      RPG.text('HP', x + 96, my - 1, { size: 9, color: '#a0b0d0' }); RPG.bar(x + 112, my + 3, 66, 4, m.hp / st.maxHp, '#60e080');
+      RPG.text(m.hp + '/' + st.maxHp, x + 212, my - 2, { size: 9, align: 'right' });
+      RPG.text('MP', x + 96, my + 13, { size: 9, color: '#a0b0d0' }); RPG.bar(x + 112, my + 17, 66, 4, st.maxMp ? m.mp / st.maxMp : 0, '#60a0ff');
+      RPG.text(m.mp + '/' + st.maxMp, x + 212, my + 12, { size: 9, align: 'right' });
+      if ((m.status || []).length) RPG.text(m.status.map(function (s) { return RPG.textOf('statuses', s.id, 'short'); }).join(''), x + 70, my + 13, { size: 9, color: '#e0a0ff' });
     });
   }
   function descBox(text) {
@@ -37,32 +41,64 @@
         RPG.box(6, 6, 84, 34);
         RPG.wrap(title, 72, 10).slice(0, 2).forEach(function (ln, i) { RPG.text(ln, 48, 11 + i * 12, { size: 10, align: 'center', color: '#ffd860' }); });
         partyPanel(94, 6, idx);
-        RPG.cursor(86, 22 + idx * 46);
+        RPG.cursor(84, 6 + idx * rowH() + rowH() / 2 - 6);
       }
     });
   }
   RPG.pickMember = pickMember;
 
+  var MENU = ['items', 'skills', 'equip', 'status', 'formation', 'settings', 'save', 'close'];
+
+  // change the party order: pick one member, then the one to swap with. The first MAX_ACTIVE fight.
+  async function formationMenu() {
+    var idx = 0, marked = -1;
+    await RPG.ui.push({
+      update: function () {
+        var n = RPG.state.party.length;
+        if (RPG.input.take('down', true)) { idx = (idx + 1) % n; RPG.sfx('cursor'); }
+        if (RPG.input.take('up', true)) { idx = (idx + n - 1) % n; RPG.sfx('cursor'); }
+        if (RPG.input.take('ok')) {
+          if (marked < 0) { marked = idx; RPG.sfx('ok'); }
+          else {
+            var p = RPG.state.party, t = p[marked]; p[marked] = p[idx]; p[idx] = t; marked = -1; RPG.sfx('item');
+          }
+        }
+        if (RPG.input.take('cancel')) { if (marked >= 0) { marked = -1; RPG.sfx('back'); } else { RPG.sfx('back'); this.close(); } }
+      },
+      draw: function () {
+        RPG.box(6, 6, 84, 74);
+        RPG.wrap(RPG.t(marked < 0 ? 'ui.formationPick' : 'ui.formationSwap'), 70, 9).slice(0, 5).forEach(function (ln, k) { RPG.text(ln, 48, 12 + k * 12, { size: 9, align: 'center', color: '#ffd860' }); });
+        RPG.box(6, 84, 84, 40);
+        RPG.wrap(RPG.t('ui.formationHint', { n: RPG.MAX_ACTIVE }), 72, 8).slice(0, 3).forEach(function (ln, k) { RPG.text(ln, 48, 90 + k * 10, { size: 8, align: 'center', color: '#c8d0e8' }); });
+        partyPanel(94, 6, idx, marked);
+        RPG.cursor(84, 6 + idx * rowH() + rowH() / 2 - 6);
+      }
+    });
+  }
+
   RPG.openMenu = async function () {
     RPG.sfx('ok');
     for (;;) {
       var i = await RPG.ui.menu({
-        items: ['items', 'skills', 'equip', 'status', 'settings', 'save', 'close'].map(function (k) { return { label: RPG.t('ui.' + k) }; }),
-        x: 6, y: 6, w: 84, rows: 7,
+        items: MENU.map(function (k) { return { label: RPG.t('ui.' + k) }; }),
+        x: 6, y: 6, w: 84, rows: MENU.length,
         drawExtra: function () {
           partyPanel(94, 6);
-          RPG.box(6, 128, 84, 40);
-          RPG.text(RPG.t('ui.gold'), 14, 134, { size: 9, color: '#a0b0d0' });
-          RPG.text(money(RPG.state.gold), 82, 148, { size: 11, align: 'right', color: '#ffd860' });
+          RPG.box(6, 146, 84, 40);
+          RPG.text(RPG.t('ui.gold'), 14, 152, { size: 9, color: '#a0b0d0' });
+          RPG.text(money(RPG.state.gold), 82, 166, { size: 11, align: 'right', color: '#ffd860' });
+          if (RPG.state.chapter) { RPG.box(6, 190, 84, 40); RPG.wrap(RPG.t('chapter.' + RPG.state.chapter + '.short'), 70, 9).slice(0, 2).forEach(function (ln, k) { RPG.text(ln, 48, 197 + k * 12, { size: 9, align: 'center', color: '#ffe0f0' }); }); }
         }
       });
-      if (i < 0 || i === 6) return;
-      if (i === 0) await itemMenu();
-      if (i === 1) await skillMenu();
-      if (i === 2) await equipMenu();
-      if (i === 3) await statusMenu();
-      if (i === 4) await RPG.openSettings();
-      if (i === 5) { var slot = await RPG.pickSlot(RPG.t('ui.saveWhich')); if (slot > 0) { RPG.save(slot); RPG.sfx('item'); RPG.ui.toast(RPG.t('ui.saved', { n: slot })); } }
+      var cmd = MENU[i];
+      if (i < 0 || cmd === 'close') return;
+      if (cmd === 'items') await itemMenu();
+      if (cmd === 'skills') await skillMenu();
+      if (cmd === 'equip') await equipMenu();
+      if (cmd === 'status') await statusMenu();
+      if (cmd === 'formation') await formationMenu();
+      if (cmd === 'settings') await RPG.openSettings();
+      if (cmd === 'save') { var slot = await RPG.pickSlot(RPG.t('ui.saveWhich')); if (slot > 0) { RPG.save(slot); RPG.sfx('item'); RPG.ui.toast(RPG.t('ui.saved', { n: slot })); } }
     }
   };
 

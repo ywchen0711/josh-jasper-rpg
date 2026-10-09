@@ -27,7 +27,10 @@ Phones get an on-screen d-pad with A / B / Menu buttons.
 - Map exploration with NPCs, chests, shops, inns, warps and random encounters in tall grass and dungeons
 - Turn-based battles: attack, skills, items, defend, run; turn order by speed; weaknesses and resistances;
   sleep / scared / sticky / sad / pumped status effects; buffs and debuffs; critical hits; boss fights
-- Three party members with their own skills learned by level, equipment for weapon / clothes / accessory
+- **Chapter 1** complete: five companions (Josh, Jasper, Mochi, Mia the dodgeball queen, Ethan the little inventor),
+  4 bosses plus an optional one, 23 kinds of monsters, about 50 items, and a chapter card + teaser at the end
+- Up to 4 fight; reserves get half EXP and the order can be changed in the menu (Party)
+- Cute hi-res chibi pixel art painted in code (`js/pixel.js`): big heads, sparkly eyes, blush, shaded monsters
 - Experience, levels, gold, item drops, 3 save slots (in the browser)
 - Traditional Chinese and English, switchable any time in Settings (remembered by the browser)
 - HD-2D look inspired by *Octopath Traveler*: the map is a tilted diorama with depth of field, bloom, light sources,
@@ -42,6 +45,7 @@ index.html               page and touch buttons
 js/core.js               data registry, party, stats, inventory, flags, save / load
 js/i18n.js               text keys and languages: RPG.t('ui.items'), RPG.name('items', 'cookie')
 js/render.js             crisp canvas, text, windows, sprite and tile caches
+js/pixel.js              pixel painter: chibi people, Mochi, monsters (32x32 detail)
 js/fx.js                 HD-2D effects: diorama tilt, depth of field, bloom, lights, particles, grading
 js/ui.js                 input, dialogue, menus, toasts, sound effects
 js/script.js             event script commands

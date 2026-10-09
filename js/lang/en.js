@@ -64,6 +64,7 @@ RPG.addText('en', {
     canyon:  { name: 'Sage Canyon Trail' },
     school:  { name: 'Sage Canyon Elementary' },
     library: { name: 'Library · STEAM Lab' },
+    cave2:   { name: "Raccoon King's Treasure Room" },
     cave:    { name: 'Raccoon Cave' }
   },
   shop: {
@@ -232,8 +233,6 @@ RPG.addText('en', {
     coach: "No trophy, no games! If you're going after it, grab some gear from the shed first!",
     mascot: { thumbs: '(A big kid in a coyote costume gives you a thumbs up.)', go: 'GO COYOTES!!', sad: '"Without the trophy, I can\'t even do my cheer dance..."' },
     leo: "I heard the RoboVac in the STEAM lab has been acting weird. It keeps sucking up strange stuff.",
-    mia: "I'm totally winning dodgeball! Don't go easy on me, Josh.",
-    ethan: 'Did you know? Hit robots with water and they short-circuit!'
   },
   library: {
     librarian: {
@@ -259,5 +258,129 @@ RPG.addText('en', {
       deal: 'R-really?! Deal!',
       josh2: "We got the trophy back! Let's take it to the principal!"
     }
+  }
+});
+
+// ======================= chapter 1: friends, items and monsters =======================
+RPG.addText('en', {
+  ui: {
+    formation: 'Party', reserve: 'Reserve', formationPick: 'Move who?', formationSwap: 'Swap with who?',
+    formationHint: 'The first {n} fight. Reserves get half EXP.'
+  },
+  chapter: {
+    1: { title: 'Chapter 1', name: 'The Missing Coyote Cup!', short: 'Chapter 1\nThe Missing Coyote Cup', end: '~ End of Chapter 1 ~' },
+    2: { teaser: 'Next: the Raccoon King says the coyote eye on the trophy is really a "glowing stone"... and he found it on the beach at Torrey Pines.' }
+  },
+  ending: {
+    7: "Mia knocked out a whole team at dodgeball by herself, and Ethan's repaired RoboVac became the Field Day scorekeeper.",
+    8: '"What adventure will tomorrow bring?" everyone wondered over ice cream.'
+  },
+  npc: { iceCream: 'Ice Cream Man', ava: 'Ava', bigGull: 'Captain Gull', guards: 'Raccoon Guards' },
+  character: {
+    mia:   { name: 'Mia', title: 'Classmate · Dodgeball Queen', bio: "The fastest girl in school, and she has never lost at dodgeball. Raccoons keep eating her lunch, and she is NOT happy." },
+    ethan: { name: 'Ethan', title: 'Classmate · Little Inventor', bio: 'Always has a screwdriver and a flashlight in his pocket. Talks fast, and even faster when he is scared.' }
+  },
+  shop: { iceCreamTruck: { name: 'Ice Cream Truck', greeting: 'Ding-dong~ Summer means ice cream!', bye: "Don't drip it on your shirt!" } },
+  item: {
+    fries:        { name: 'French Fries', desc: 'Restores 75 HP. Best when hot.' },
+    energyBar:    { name: 'Energy Bar', desc: 'Restores 60 HP and 10 MP.' },
+    iceCream:     { name: 'Vanilla Cone', desc: 'Restores 35 MP. Brain freeze!' },
+    rainbowCandy: { name: 'Rainbow Candy', desc: 'Cures all status problems.' },
+    bobaTea:      { name: 'Boba Tea', desc: 'Restores 90 HP and 12 MP to the whole party.' },
+    stinkBomb:    { name: 'Stink Bomb', desc: 'May scare all enemies stiff. (Battle only)' },
+    superGlue:    { name: 'Super Glue', desc: 'Makes one enemy sticky. (Battle only)' },
+    dodgeball:    { name: 'Dodgeball', desc: 'Mia only. Attack +7, Speed +1' },
+    proBall:      { name: 'Pro Dodgeball', desc: 'Mia only. Attack +15, Speed +2' },
+    screwdriver:  { name: 'Screwdriver', desc: 'Ethan only. Attack +4, Magic +5' },
+    zapper:       { name: 'Zapper', desc: 'Ethan only. Magic +12. Normal attacks become thunder.' },
+    kneePads:     { name: 'Knee Pads', desc: 'Defense +7, Speed +2' },
+    labCoat:      { name: 'Lab Coat', desc: 'Jasper & Ethan only. Defense +5, Magic +5' },
+    sunHat:       { name: 'Sun Hat', desc: 'Defense +5, Magic +2, HP +10' },
+    headband:     { name: 'Sweatband', desc: 'Attack +3, Speed +3' },
+    goggles:      { name: 'Goggles', desc: 'Magic +5, Defense +1' },
+    friendBracelet: { name: 'Friendship Bracelet', desc: 'Luck +5, HP +15. Everyone made it together.' },
+    comfySocks:   { name: 'Comfy Socks', desc: 'HP +20, Defense +2' },
+    bandana:      { name: 'Bandana', desc: 'Mochi only. Attack +3, Speed +3' },
+    superCape:    { name: 'Super Cape', desc: 'Speed +6, Luck +4, Attack +2. You feel like you could fly.' },
+    flashlight:   { name: "Ethan's Flashlight", desc: 'Super bright. Lights up pitch-black caves.' }
+  },
+  skill: {
+    quickThrow:  { name: 'Quick Throw', desc: 'A fast, accurate throw.' },
+    doubleThrow: { name: 'Double Throw', desc: 'Two balls in a row at one enemy.' },
+    pepRally:    { name: 'Pep Rally', desc: 'Party Speed up a lot, Attack up a little.' },
+    cannonball:  { name: 'Cannonball', desc: 'An all-out super throw.' },
+    ballStorm:   { name: 'Ball Storm', desc: 'Two rounds of dodgeballs at all enemies.' },
+    zap:         { name: 'Zap', desc: 'A little shock (thunder).' },
+    fixIt:       { name: 'Fix It', desc: "Restores one ally's HP and wipes off the goo." },
+    waterJet:    { name: 'Water Jet', desc: 'A strong water blast (water). Robots hate it.' },
+    shieldBot:   { name: 'Shield Bot', desc: "Raises the party's Defense for 3 turns." },
+    sciFog:      { name: 'Science Fog', desc: 'Makes enemies sleepy and slow.' },
+    teslaCoil:   { name: 'Tesla Coil', desc: 'Lightning hits all enemies.' },
+    acornToss:   { name: 'Acorn Toss' },
+    dash:        { name: 'Meep Meep Dash' },
+    roll:        { name: 'Roll Around' },
+    rattle:      { name: 'Tail Rattle' },
+    scribble:    { name: 'Scribble' },
+    fizz:        { name: 'Fizz' },
+    spores:      { name: 'Sleepy Spores' },
+    playDead:    { name: 'Play Dead' },
+    bucketBash:  { name: 'Bucket Bash' },
+    hunker:      { name: 'Hunker Down' },
+    gullDive:    { name: 'Snack Dive' }
+  },
+  enemy: {
+    squirrel:   { name: 'Squirrel' },
+    roadrunner: { name: 'Roadrunner' },
+    tumbleweed: { name: 'Tumbleweed' },
+    rattler:    { name: 'Lil Rattler' },
+    bigGull:    { name: 'Captain Gull', defeat: "{name}'s hat blows away, and he flies off after it!" },
+    pencil:     { name: 'Pencil Soldier' },
+    beaker:     { name: 'Beaker Blob' },
+    mushroom:   { name: 'Glow Shroom' },
+    possum:     { name: 'Possum' },
+    raccoonGuard: { name: 'Raccoon Guard', defeat: "{name}'s bucket slips down over its eyes!" }
+  },
+  troop: {
+    bigGull: { intro: 'Captain Gull spreads his wings: "This is MY turf!"' },
+    guards:  { intro: 'The Raccoon Guards block the way! "The king is napping. No one gets through!"' }
+  },
+  street: { iceCream: 'Ding-dong~ The ice cream truck is here!' },
+  school: {
+    mia: {
+      practice: "I'm totally winning dodgeball! Don't go easy on me, Josh.",
+      join1: "You're looking for the trophy? I heard raccoons did it...",
+      join2: "Those raccoons steal my lunch every day! This time I'm going after THEM!",
+      josh: "Awesome! With Mia on the team, dodgeball's covered!",
+      join3: "Leave it to me! Anyone in our way gets bonked!"
+    },
+    ava: { hi: "Did you know there's an ice cream truck at the park? The boba tea is SO good!", gull: "There's a big gull in a hat down in the canyon. I heard he steals people's snacks..." }
+  },
+  library: {
+    ethan: {
+      hide1: "Shh! I'm hiding... that RoboVac sucked up my notes!",
+      hide2: "Robots hate water! Hit it with water and it'll short-circuit... probably.",
+      out: 'Y-you beat it!? I KNEW water would work!',
+      thanks: "I'm Ethan. Thanks for saving my notes... even if they're all dusty now.",
+      jasper: 'Your flashlight is so cool!',
+      join: "It's a super-bright flashlight I built. The raccoons live in a cave, right? I'm coming too!"
+    }
+  },
+  canyon: {
+    tooDark: "It's pitch black in the cave. We can't see a thing... we need a flashlight.",
+    gull: {
+      hey: 'SQUAWK! Listen up, kids. This is the Captain\'s turf. Hand over your snacks!',
+      mia: "You're the gull who's been stealing everyone's lunch!",
+      fight: 'SQUAWK SQUAWK! Want to get past? Beat the Captain first!',
+      lost: "Squawk... my hat! You haven't seen the last of me!"
+    }
+  },
+  cave: {
+    guards: {
+      halt: "Halt! The king's treasure room is ahead. No visitors!",
+      ethan: "I-it's the Raccoon Guards... the ones with buckets on their heads...",
+      fight: "If you want to get past, you'll have to get past US!",
+      lost: 'Waaah... Your Majesty, we tried our best...'
+    },
+    king: { mochi: '(Mochi wags happily, and the Raccoon King can\'t help giving him a pat on the head.)' }
   }
 });

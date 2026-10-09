@@ -7,6 +7,7 @@ global.window = {};
 vm.runInThisContext(fs.readFileSync(path.join(__dirname, '../js/core.js'), 'utf8'));
 const RPG = global.RPG = window.RPG;
 vm.runInThisContext(fs.readFileSync(path.join(__dirname, '../js/i18n.js'), 'utf8'));
+vm.runInThisContext(fs.readFileSync(path.join(__dirname, '../js/pixel.js'), 'utf8'));
 const langDir = path.join(__dirname, '../js/lang');
 fs.readdirSync(langDir).forEach((f) => vm.runInThisContext(fs.readFileSync(path.join(langDir, f), 'utf8'), { filename: f }));
 ['sprites', 'tiles', 'visuals', 'skills', 'items', 'characters', 'enemies', 'config', 'maps'].forEach((f) => {
@@ -34,6 +35,7 @@ function checkScript(script, where) {
     if (c.choice) c.choice.forEach((k) => text(k, w));
     if (c.text) text(c.text, w);
     if (c.toast) text(c.toast, w);
+    if (c.chapter) ['title', 'name', 'short'].forEach((f) => text(`chapter.${c.chapter}.${f}`, w));
     if (c.name) speaker(c.name, w);
     if (c.give) need('items', c.give, w);
     if (c.take) need('items', c.take, w);
@@ -104,6 +106,7 @@ db.config.startParty.forEach((c) => need('characters', c, 'config.startParty'));
 need('maps', db.config.startMap, 'config.startMap');
 checkScript(db.config.intro, 'config.intro');
 (db.config.ending || []).forEach((k) => text(k, 'config.ending'));
+if (db.config.endingCard) Object.values(db.config.endingCard).forEach((k) => text(k, 'config.endingCard'));
 
 // names and descriptions of everything in the database
 const learnable = new Set();

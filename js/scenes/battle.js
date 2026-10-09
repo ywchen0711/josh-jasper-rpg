@@ -23,7 +23,7 @@
     RPG.scene = prev;
     if (result === 'lose') {
       if (!opts.canLose) { RPG.fadeAlpha = 0; await RPG.gameOver(); return 'lose'; }
-      RPG.party().forEach(function (m) { m.hp = Math.max(1, m.hp); });
+      RPG.activeParty().forEach(function (m) { m.hp = Math.max(1, m.hp); });
     }
     await RPG.fadeIn(14);
     return result;
@@ -38,7 +38,7 @@
     this.troop = troop; this.opts = opts;
     this.backdrop = troop.backdrop || (RPG.scenes.map.map && RPG.scenes.map.map.backdrop) || 'default';
     this.popups = []; this.fx = []; this.msg = null;
-    this.party = RPG.party();
+    this.party = RPG.activeParty();
     this.party.forEach(function (m) { m.buffs = []; m.defending = false; m.status = m.status || []; });
     var counts = {}, seen = {};
     troop.enemies.forEach(function (id) { counts[id] = (counts[id] || 0) + 1; });
@@ -54,7 +54,8 @@
         shake: 0, flash: 0, deathT: 0
       };
     });
-    this.party.forEach(function (m, i) { m.bx = 248 + i * 8; m.by = 56 + i * 30; m.shake = 0; m.flash = 0; });
+    var gap = this.party.length > 3 ? 26 : 30;
+    this.party.forEach(function (m, i) { m.bx = 244 + i * 9; m.by = (this.party.length > 3 ? 42 : 56) + i * gap; m.shake = 0; m.flash = 0; }, this);
   }
   var B = Battle.prototype;
 
@@ -326,6 +327,10 @@
         u.learned.forEach(function (sk) { ups.push({ text: RPG.t('battle.learned', { skill: RPG.name('skills', sk) }), color: '#a0d8ff' }); });
       });
     });
+    // members waiting in reserve learn by watching: half the experience
+    RPG.party().filter(RPG.isReserve).forEach(function (m) {
+      RPG.gainExp(m, Math.floor(exp / 2)).forEach(function (u) { ups.push({ text: RPG.t('battle.levelUp', { name: RPG.nameOf(m), level: u.level }), color: '#80ffb0' }); });
+    });
     await RPG.ui.alert(lines);
     if (ups.length) { RPG.sfx('levelup'); await RPG.ui.alert(ups, { w: 240 }); }
     return 'win';
@@ -385,9 +390,10 @@
     // message bar
     if (this.msg) { RPG.box(4, 4, RPG.W - 8, 24); RPG.text(this.msg, 14, 10, { size: 11 }); }
     // party status window
-    RPG.box(82, 170, RPG.W - 86, 66);
+    var rowH = this.party.length > 3 ? 15 : 18, top = this.party.length > 3 ? 168 : 170;
+    RPG.box(82, top, RPG.W - 86, RPG.H - top - 4);
     this.party.forEach(function (m, i) {
-      var y = 177 + i * 18, st = RPG.stats(m), alive = RPG.alive(m);
+      var y = top + 7 + i * rowH, st = RPG.stats(m), alive = RPG.alive(m);
       RPG.text(RPG.nameOf(m), 92, y, { size: 10, bold: true, color: self.active === m ? '#ffd860' : alive ? '#f4f0e8' : '#ff7070' });
       RPG.text('HP', 146, y + 1, { size: 8, color: '#a0b0d0' });
       RPG.bar(160, y + 4, 52, 4, m.hp / st.maxHp, m.hp < st.maxHp * 0.3 ? '#ff6060' : '#60e080');

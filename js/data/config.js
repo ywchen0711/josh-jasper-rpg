@@ -6,7 +6,7 @@
   'use strict';
 
   RPG.config({
-    titleSprites: [{ sprite: 'josh' }, { sprite: 'coyote' }, { sprite: 'jasper' }],
+    titleSprites: [{ sprite: 'mia' }, { sprite: 'josh' }, { sprite: 'coyote' }, { sprite: 'jasper' }, { sprite: 'ethan' }, { sprite: 'mochi' }],
     startParty: ['josh', 'jasper'],
     startMap: 'home', startX: 4, startY: 5, startDir: 'down',
     startGold: 30,
@@ -16,6 +16,7 @@
 
     // played once when a new game starts
     intro: [
+      { chapter: 1 },
       { say: 'intro.1' },
       { say: 'intro.2', name: 'mom' },
       { say: 'intro.3', name: 'josh' },
@@ -27,7 +28,9 @@
     ],
 
     // ending pages (text keys)
-    ending: ['ending.1', 'ending.2', 'ending.3', 'ending.4', 'ending.5', 'ending.6'],
+    ending: ['ending.1', 'ending.2', 'ending.3', 'ending.7', 'ending.4', 'ending.8'],
+    // the card after the ending: "Chapter 1 complete" and a peek at what's next
+    endingCard: { top: 'chapter.1.end', big: 'chapter.1.name', sub: 'chapter.2.teaser' },
 
     // default characters for map rows; a map can add or override entries with its own `legend`
     legend: {
@@ -47,10 +50,14 @@
   //   texts: shop.<id>.name, shop.<id>.greeting, shop.<id>.bye (greeting / bye are optional)
   RPG.add('shops', {
     schoolStore: { keeper: 'clerk',
-                   items: ['cookie', 'juice', 'milk', 'bandaid', 'waterBalloon', 'popRocks', 'whoopee', 'stick', 'hoodie', 'eraser', 'chewToy', 'dogVest'] },
+                   items: ['cookie', 'fries', 'juice', 'milk', 'energyBar', 'bandaid', 'rainbowCandy', 'waterBalloon', 'popRocks', 'stinkBomb', 'superGlue', 'whoopee',
+                           'stick', 'hoodie', 'eraser', 'comfySocks', 'chewToy', 'dogVest', 'bandana'] },
     coachShed:   { keeper: 'coach',
-                   items: ['bat', 'sneakers', 'uniform', 'raincoat', 'magicPencil', 'bell', 'sticker', 'bento'] },
+                   items: ['bat', 'dodgeball', 'proBall', 'screwdriver', 'zapper', 'magicPencil', 'kneePads', 'uniform', 'raincoat', 'labCoat',
+                           'sneakers', 'headband', 'goggles', 'bell', 'sticker', 'bento'] },
     vending:     { keeper: null,
-                   items: ['cookie', 'juice', 'milk', 'bandaid', 'waterBalloon'] }
+                   items: ['cookie', 'fries', 'juice', 'milk', 'energyBar', 'bandaid', 'waterBalloon'] },
+    iceCreamTruck: { keeper: 'iceCream',
+                   items: ['iceCream', 'bobaTea', 'rainbowCandy', 'energyBar', 'sunHat', 'friendBracelet', 'sticker'] }
   });
 })();

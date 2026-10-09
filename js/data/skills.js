@@ -51,6 +51,21 @@
     puppyEyes:  { mp: 4, target: 'enemy', anim: 'shine', effects: [{ type: 'buff', stat: 'atk', mult: 0.7, turns: 3 }, { type: 'status', status: 'sad', chance: 0.4 }] },
     zoomies:    { mp: 6, target: 'enemies', anim: 'hit', effects: [{ type: 'damage', power: 0.95 }] },
 
+    // ---- Mia: dodgeball queen ----
+    quickThrow: { mp: 2, target: 'enemy', anim: 'ball', effects: [{ type: 'damage', power: 1.3 }] },
+    doubleThrow:{ mp: 4, target: 'enemy', anim: 'ball', effects: [{ type: 'damage', power: 0.85 }, { type: 'damage', power: 0.85 }] },
+    pepRally:   { mp: 5, target: 'allies', anim: 'stars', effects: [{ type: 'buff', stat: 'spd', mult: 1.35, turns: 3 }, { type: 'buff', stat: 'atk', mult: 1.1, turns: 3 }] },
+    cannonball: { mp: 7, target: 'enemy', anim: 'kick', effects: [{ type: 'damage', power: 2.5 }] },
+    ballStorm:  { mp: 10, target: 'enemies', anim: 'ball', effects: [{ type: 'damage', power: 0.75 }, { type: 'damage', power: 0.75 }] },
+
+    // ---- Ethan: gadgets ----
+    zap:        { mp: 3, target: 'enemy', anim: 'bolt', effects: [{ type: 'damage', kind: 'magic', power: 1.45, element: 'thunder' }] },
+    fixIt:      { mp: 4, target: 'ally', anim: 'heal', field: true, effects: [{ type: 'heal', power: 1.9, amount: 14 }, { type: 'cure', status: ['sticky'] }] },
+    waterJet:   { mp: 5, target: 'enemy', anim: 'water', effects: [{ type: 'damage', kind: 'magic', power: 1.75, element: 'water' }] },
+    shieldBot:  { mp: 6, target: 'allies', anim: 'shine', effects: [{ type: 'buff', stat: 'def', mult: 1.4, turns: 3 }] },
+    sciFog:     { mp: 6, target: 'enemies', anim: 'bubbles', effects: [{ type: 'status', status: 'sleep', chance: 0.45 }, { type: 'buff', stat: 'spd', mult: 0.8, turns: 3 }] },
+    teslaCoil:  { mp: 11, target: 'enemies', anim: 'bolt', effects: [{ type: 'damage', kind: 'magic', power: 1.35, element: 'thunder' }] },
+
     // ---- enemies ----
     sting:      { target: 'enemy', anim: 'claw', effects: [{ type: 'damage', power: 0.9 }, { type: 'status', status: 'sticky', chance: 0.35 }] },
     screech:    { target: 'enemies', anim: 'bark', effects: [{ type: 'status', status: 'scared', chance: 0.25 }] },
@@ -66,6 +81,17 @@
     overdrive:  { target: 'enemies', mp: 8, anim: 'slam', effects: [{ type: 'damage', power: 1.1 }] },
     kingSlam:   { target: 'enemy', anim: 'slam', effects: [{ type: 'damage', power: 1.8 }] },
     trashStorm: { target: 'enemies', mp: 6, anim: 'fire', effects: [{ type: 'damage', power: 1.05 }, { type: 'status', status: 'sticky', chance: 0.3 }] },
+    acornToss:  { target: 'enemy', anim: 'ball', effects: [{ type: 'damage', power: 1.05 }] },
+    dash:       { target: 'enemy', anim: 'hit', effects: [{ type: 'damage', power: 1.35 }] },
+    roll:       { target: 'enemies', mp: 3, anim: 'hit', effects: [{ type: 'damage', power: 0.7 }] },
+    rattle:     { target: 'enemies', mp: 3, anim: 'bark', effects: [{ type: 'status', status: 'scared', chance: 0.35 }] },
+    scribble:   { target: 'enemy', anim: 'claw', effects: [{ type: 'damage', power: 0.95 }, { type: 'status', status: 'sad', chance: 0.3 }] },
+    fizz:       { target: 'enemies', mp: 4, anim: 'bubbles', effects: [{ type: 'damage', kind: 'magic', power: 0.7, element: 'water' }, { type: 'status', status: 'sticky', chance: 0.25 }] },
+    spores:     { target: 'enemies', mp: 4, anim: 'bubbles', effects: [{ type: 'status', status: 'sleep', chance: 0.35 }] },
+    playDead:   { target: 'self', mp: 3, anim: 'zzz', effects: [{ type: 'heal', percent: 0.3 }] },
+    bucketBash: { target: 'enemy', anim: 'slam', effects: [{ type: 'damage', power: 1.45 }] },
+    hunker:     { target: 'self', anim: 'shine', effects: [{ type: 'buff', stat: 'def', mult: 1.5, turns: 2 }] },
+    gullDive:   { target: 'enemy', mp: 4, anim: 'slam', effects: [{ type: 'damage', power: 1.6 }] },
     feast:      { target: 'self', mp: 6, anim: 'heal', effects: [{ type: 'heal', percent: 0.18 }, { type: 'buff', stat: 'atk', mult: 1.2, turns: 2 }] }
   });
 })();

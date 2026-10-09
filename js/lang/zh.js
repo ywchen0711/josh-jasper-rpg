@@ -64,6 +64,7 @@ RPG.addText('zh', {
     canyon:  { name: 'Sage Canyon 峽谷步道' },
     school:  { name: 'Sage Canyon 小學' },
     library: { name: '圖書館・STEAM 實驗室' },
+    cave2:   { name: '浣熊大王的寶物庫' },
     cave:    { name: '浣熊洞窟' }
   },
   shop: {
@@ -232,8 +233,6 @@ RPG.addText('zh', {
     coach: '沒有獎盃，比賽開不了！你們要去找獎盃的話，先來器材室挑裝備！',
     mascot: { thumbs: '（穿著郊狼布偶裝的學長對你們比了一個讚。）', go: 'GO COYOTES！！', sad: '「獎盃不見了，我連加油舞都跳不起來……」' },
     leo: '我聽說 STEAM 實驗室的掃地機器人最近怪怪的，一直在吸奇怪的東西。',
-    mia: '躲避球比賽我一定要贏！Josh 你不要手下留情喔。',
-    ethan: '你知道嗎？用水攻擊機器人的話，它們會短路喔！'
   },
   library: {
     librarian: {
@@ -259,5 +258,129 @@ RPG.addText('zh', {
       deal: '真、真的嗎！成交！',
       josh2: '拿回獎盃了！快回學校交給校長！'
     }
+  }
+});
+
+// ======================= chapter 1: friends, items and monsters =======================
+RPG.addText('zh', {
+  ui: {
+    formation: '隊伍', reserve: '待命中', formationPick: '要換誰的位置？', formationSwap: '要和誰交換？',
+    formationHint: '前 {n} 位上場戰鬥，待命的人得到一半經驗值'
+  },
+  chapter: {
+    1: { title: '第一章', name: '郊狼獎盃不見了！', short: '第一章\n郊狼獎盃不見了！', end: '～ 第一章　完 ～' },
+    2: { teaser: '下一章：浣熊大王說，獎盃上的郊狼眼睛其實是一顆「會發光的石頭」，而它是從 Torrey Pines 的海邊撿來的……' }
+  },
+  ending: {
+    7: 'Mia 在躲避球比賽一個人打倒了整隊，Ethan 的掃地機器人修好後變成了運動會的計分員。',
+    8: '「明天還會有什麼冒險呢？」大家一邊吃冰淇淋一邊想。'
+  },
+  npc: { iceCream: '冰淇淋車老闆', ava: '同學 Ava', bigGull: '海鷗老大', guards: '浣熊護衛隊' },
+  character: {
+    mia:   { name: 'Mia', title: '同學・躲避球女王', bio: '全校跑最快的女生，躲避球從來沒輸過。浣熊每天偷吃她的午餐，她很生氣。' },
+    ethan: { name: 'Ethan', title: '同學・小小發明家', bio: '口袋裡永遠有螺絲起子和手電筒。說話很快，害怕的時候說得更快。' }
+  },
+  shop: { iceCreamTruck: { name: '冰淇淋車', greeting: '叮咚叮咚～夏天就是要吃冰！', bye: '小心不要滴到衣服喔！' } },
+  item: {
+    fries:        { name: '薯條', desc: '回復 75 HP。熱熱的最好吃。' },
+    energyBar:    { name: '能量棒', desc: '回復 60 HP 和 10 MP。' },
+    iceCream:     { name: '香草冰淇淋', desc: '回復 35 MP。頭會有點痛。' },
+    rainbowCandy: { name: '彩虹糖', desc: '治好所有異常狀態。' },
+    bobaTea:      { name: '珍珠奶茶', desc: '全隊回復 90 HP 和 12 MP。' },
+    stinkBomb:    { name: '臭臭彈', desc: '可能把所有敵人嚇呆。（戰鬥中使用）' },
+    superGlue:    { name: '超強膠水', desc: '讓一個敵人黏答答。（戰鬥中使用）' },
+    dodgeball:    { name: '躲避球', desc: 'Mia 專用。攻擊 +7、速度 +1' },
+    proBall:      { name: '職業躲避球', desc: 'Mia 專用。攻擊 +15、速度 +2' },
+    screwdriver:  { name: '螺絲起子', desc: 'Ethan 專用。攻擊 +4、魔力 +5' },
+    zapper:       { name: '電電槍', desc: 'Ethan 專用。魔力 +12，普通攻擊變成雷屬性。' },
+    kneePads:     { name: '護膝', desc: '防禦 +7、速度 +2' },
+    labCoat:      { name: '實驗袍', desc: 'Jasper、Ethan 專用。防禦 +5、魔力 +5' },
+    sunHat:       { name: '遮陽帽', desc: '防禦 +5、魔力 +2、HP +10' },
+    headband:     { name: '運動頭帶', desc: '攻擊 +3、速度 +3' },
+    goggles:      { name: '護目鏡', desc: '魔力 +5、防禦 +1' },
+    friendBracelet: { name: '友情手環', desc: '幸運 +5、HP +15。大家一起編的。' },
+    comfySocks:   { name: '軟綿綿襪子', desc: 'HP +20、防禦 +2' },
+    bandana:      { name: '小領巾', desc: '麻糬專用。攻擊 +3、速度 +3' },
+    superCape:    { name: '超人披風', desc: '速度 +6、幸運 +4、攻擊 +2。穿上就覺得自己會飛。' },
+    flashlight:   { name: 'Ethan 的手電筒', desc: '超亮。可以照亮黑漆漆的洞窟。' }
+  },
+  skill: {
+    quickThrow:  { name: '快速傳球', desc: '又快又準的一球。' },
+    doubleThrow: { name: '雙球連發', desc: '兩顆球連續打中一個敵人。' },
+    pepRally:    { name: '啦啦隊', desc: '全隊速度大幅上升、攻擊小幅上升。' },
+    cannonball:  { name: '砲彈球', desc: '用盡全力的超強一球。' },
+    ballStorm:   { name: '躲避球風暴', desc: '對所有敵人丟兩輪躲避球。' },
+    zap:         { name: '電一下', desc: '小小的電擊（雷屬性）。' },
+    fixIt:       { name: '修理一下', desc: '回復一位隊友的 HP，順便把黏答答擦乾淨。' },
+    waterJet:    { name: '水柱發射', desc: '強力水柱（水屬性）。機器人最怕。' },
+    shieldBot:   { name: '防護機器人', desc: '全隊防禦上升 3 回合。' },
+    sciFog:      { name: '科學煙霧', desc: '讓敵人想睡覺、動作變慢。' },
+    teslaCoil:   { name: '特斯拉線圈', desc: '雷電攻擊所有敵人。' },
+    acornToss:   { name: '丟橡實' },
+    dash:        { name: '嗶嗶衝刺' },
+    roll:        { name: '滾來滾去' },
+    rattle:      { name: '搖尾巴沙沙' },
+    scribble:    { name: '亂畫一通' },
+    fizz:        { name: '冒泡泡' },
+    spores:      { name: '睏睏孢子' },
+    playDead:    { name: '裝死' },
+    bucketBash:  { name: '水桶頭槌' },
+    hunker:      { name: '縮起來' },
+    gullDive:    { name: '俯衝搶食' }
+  },
+  enemy: {
+    squirrel:   { name: '松鼠' },
+    roadrunner: { name: '走鵑' },
+    tumbleweed: { name: '風滾草' },
+    rattler:    { name: '響尾蛇小子' },
+    bigGull:    { name: '海鷗老大', defeat: '{name} 的帽子飛走了，牠追著帽子飛走了！' },
+    pencil:     { name: '鉛筆小兵' },
+    beaker:     { name: '燒杯怪' },
+    mushroom:   { name: '發光蘑菇' },
+    possum:     { name: '負鼠' },
+    raccoonGuard: { name: '浣熊護衛', defeat: '{name} 的水桶掉下來蓋住了眼睛！' }
+  },
+  troop: {
+    bigGull: { intro: '海鷗老大張開翅膀：「這裡是本船長的地盤！」' },
+    guards:  { intro: '浣熊護衛隊擋住了去路！「大王在睡午覺，不准過！」' }
+  },
+  street: { iceCream: '叮咚叮咚～冰淇淋車來囉！' },
+  school: {
+    mia: {
+      practice: '躲避球比賽我一定要贏！Josh，你不要手下留情喔。',
+      join1: '你們要去找獎盃？我聽說是浣熊搞的鬼……',
+      join2: '那些浣熊每天都偷吃我的午餐！這次換我去找牠們算帳！',
+      josh: '太好了！有 Mia 在，躲避球就交給你了！',
+      join3: '交給我！誰敢擋路，我就一球把牠打飛！'
+    },
+    ava: { hi: '你們知道嗎？公園有冰淇淋車喔，珍珠奶茶超好喝！', gull: '峽谷那邊有一隻戴帽子的大海鷗，聽說牠會搶人家的點心……' }
+  },
+  library: {
+    ethan: {
+      hide1: '噓！我躲在這裡……那台掃地機器人把我的筆記吸走了！',
+      hide2: '機器人怕水！用水攻擊它的話，它就會短路……應該啦。',
+      out: '你、你們打贏了！？我就知道水有用！',
+      thanks: '我是 Ethan。謝謝你們救了我的筆記……雖然上面都是灰塵。',
+      jasper: '你那個手電筒好酷！',
+      join: '這是我做的超亮手電筒。浣熊住在洞窟裡對吧？我也要去！'
+    }
+  },
+  canyon: {
+    tooDark: '洞窟裡面黑漆漆的，什麼都看不見……需要一個手電筒。',
+    gull: {
+      hey: '嘎！小鬼們，這裡是本船長的地盤，留下你們的點心！',
+      mia: '你就是搶走大家午餐的那隻海鷗！',
+      fight: '嘎嘎！想要過去，就打贏本船長吧！',
+      lost: '嘎……我的帽子！你們給我記住！'
+    }
+  },
+  cave: {
+    guards: {
+      halt: '站住！前面是大王的寶物庫，閒雜人等不准進去！',
+      ethan: '是、是浣熊護衛隊……戴著水桶的那種……',
+      fight: '想過去的話，先過我們這一關！',
+      lost: '嗚嗚……大王，我們盡力了……'
+    },
+    king: { mochi: '汪！（麻糬開心地搖尾巴，浣熊大王忍不住摸了摸牠的頭。）' }
   }
 });

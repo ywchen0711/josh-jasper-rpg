@@ -30,7 +30,7 @@
   };
 
   // ======================= text =======================
-  var FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei","Segoe UI",sans-serif';
+  var FONT = '"Nunito","Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei","Segoe UI",sans-serif';
   RPG.font = function (size, bold) { return (bold ? '700 ' : '500 ') + (size || 11) + 'px ' + FONT; };
   RPG.text = function (str, x, y, opts) {
     var g = RPG.ctx;
@@ -68,29 +68,47 @@
   RPG.box = function (x, y, w, h, opts) {
     var g = RPG.ctx;
     opts = opts || {};
-    var gr = g.createLinearGradient(0, y, 0, y + h);
-    gr.addColorStop(0, opts.fill || 'rgba(26,36,80,0.95)'); gr.addColorStop(1, opts.fill2 || opts.fill || 'rgba(12,18,44,0.95)');
-    g.fillStyle = gr; roundRect(g, x, y, w, h, 4); g.fill();
-    g.strokeStyle = opts.border || '#e8dcc0'; g.lineWidth = 1.2;
-    roundRect(g, x + 1.5, y + 1.5, w - 3, h - 3, 3); g.stroke();
-    g.strokeStyle = 'rgba(255,255,255,0.12)'; g.lineWidth = 1;
-    roundRect(g, x + 3, y + 3, w - 6, h - 6, 2); g.stroke();
+    var r = Math.min(7, h / 2 - 1), gr = g.createLinearGradient(0, y, 0, y + h);
+    gr.addColorStop(0, opts.fill || 'rgba(58,62,128,0.95)'); gr.addColorStop(1, opts.fill2 || opts.fill || 'rgba(32,30,78,0.95)');
+    g.fillStyle = 'rgba(10,6,30,0.35)'; roundRect(g, x + 1, y + 2, w, h, r); g.fill();           // soft drop shadow
+    g.fillStyle = gr; roundRect(g, x, y, w, h, r); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.07)'; roundRect(g, x + 2, y + 2, w - 4, Math.min(10, h / 2), Math.max(1, r - 2)); g.fill();
+    g.strokeStyle = opts.border || '#fff1d6'; g.lineWidth = 1.4;
+    roundRect(g, x + 1.2, y + 1.2, w - 2.4, h - 2.4, r - 1); g.stroke();
+    g.strokeStyle = 'rgba(255,190,210,0.35)'; g.lineWidth = 1;
+    roundRect(g, x + 3, y + 3, w - 6, h - 6, Math.max(1, r - 3)); g.stroke();
+    if (w > 40 && h > 20 && opts.sparkle !== false) star(g, x + w - 7, y + 6, 1.8, '#ffe9a8');
   };
+  function star(g, x, y, r, color) {
+    g.fillStyle = color; g.beginPath();
+    g.moveTo(x, y - r * 2); g.lineTo(x + r * 0.5, y - r * 0.5); g.lineTo(x + r * 2, y); g.lineTo(x + r * 0.5, y + r * 0.5);
+    g.lineTo(x, y + r * 2); g.lineTo(x - r * 0.5, y + r * 0.5); g.lineTo(x - r * 2, y); g.lineTo(x - r * 0.5, y - r * 0.5); g.closePath(); g.fill();
+  }
+  RPG.star = star;
   function roundRect(g, x, y, w, h, r) {
     g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
     g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
   }
   RPG.bar = function (x, y, w, h, frac, color) {
     var g = RPG.ctx;
-    g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(x, y, w, h);
     var gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.35, color); gr.addColorStop(1, color);
-    g.fillStyle = gr; g.fillRect(x, y, Math.round(w * RPG.clamp(frac, 0, 1)), h);
+    g.fillStyle = 'rgba(0,0,0,0.0)'; roundRect(g, x, y, w, h, h / 2);
+    g.save(); g.clip(); g.fillStyle = 'rgba(20,14,40,0.6)'; g.fillRect(x, y, w, h);
+    g.fillStyle = gr; g.fillRect(x, y, Math.round(w * RPG.clamp(frac, 0, 1)), h); g.restore();
   };
   RPG.cursor = function (x, y) {
-    var g = RPG.ctx, b = Math.floor(RPG.frame / 15) % 2;
-    g.fillStyle = '#ffffff';
-    g.beginPath(); g.moveTo(x + b, y); g.lineTo(x + 6 + b, y + 4); g.lineTo(x + b, y + 8); g.closePath(); g.fill();
+    // a little bouncing heart
+    var g = RPG.ctx, b = Math.round(Math.sin(RPG.frame / 6) * 1.2), cx = x + 3.5 + b, cy = y + 4;
+    g.fillStyle = 'rgba(0,0,0,0.4)'; heart(g, cx + 0.7, cy + 0.7, 3.4);
+    g.fillStyle = '#ff7a9c'; heart(g, cx, cy, 3.4);
+    g.fillStyle = '#ffd4de'; g.fillRect(cx - 2.2, cy - 2.2, 1.2, 1.2);
   };
+
+  function heart(g, x, y, r) {
+    g.beginPath(); g.moveTo(x, y + r);
+    g.bezierCurveTo(x - r * 1.6, y - r * 0.2, x - r * 0.8, y - r * 1.5, x, y - r * 0.5);
+    g.bezierCurveTo(x + r * 0.8, y - r * 1.5, x + r * 1.6, y - r * 0.2, x, y + r); g.fill();
+  }
 
   // ======================= sprites: paint → Scale2x → outline → light =======================
   var spriteCache = {};
@@ -161,8 +179,15 @@
   RPG.spriteImage = function (id, pose, frame, palette, flip) {
     var key = id + '|' + pose + '|' + frame + '|' + (palette ? JSON.stringify(palette) : '') + (flip ? '|f' : '');
     if (spriteCache[key]) return spriteCache[key];
-    var sp = RPG.get('sprites', id), frames = sp.frames[pose] || sp.frames[Object.keys(sp.frames)[0]];
-    var img = finish(scale2x(paint(frames[frame % frames.length], Object.assign({}, sp.palette, palette || {}))), sp);
+    var sp = RPG.get('sprites', id), pal = Object.assign({}, sp.palette, palette || {}), img;
+    if (sp.paint) {                                    // painted by code at 2x (js/pixel.js): no upscaling needed
+      var P = new RPG.Pix(sp.w * 2, sp.h * 2);
+      sp.paint(P, pose, frame, pal);
+      img = finish(P.canvas(), sp);
+    } else {
+      var frames = sp.frames[pose] || sp.frames[Object.keys(sp.frames)[0]];
+      img = finish(scale2x(paint(frames[frame % frames.length], pal)), sp);
+    }
     if (flip) img = flipped(img);
     spriteCache[key] = img;
     return img;
@@ -186,7 +211,9 @@
     return img;
   };
   RPG.spriteSize = function (id, pose) {
-    var sp = RPG.get('sprites', id), f = sp.frames[pose] || sp.frames[Object.keys(sp.frames)[0]];
+    var sp = RPG.get('sprites', id);
+    if (sp.paint) return { w: sp.w, h: sp.h };
+    var f = sp.frames[pose] || sp.frames[Object.keys(sp.frames)[0]];
     return { w: f[0][0].length, h: f[0].length };
   };
 

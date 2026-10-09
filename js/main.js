@@ -69,7 +69,7 @@
       var c = RPG.db.config, g = RPG.ctx;
       if (RPG.db.backdrops.title) RPG.db.backdrops.title.draw(g, this.t);
       if (c.titleSprites) c.titleSprites.forEach(function (s, i) {
-        var x = RPG.W / 2 - 52 + i * 36, y = 150 + Math.abs(Math.sin((RPG.frame + i * 20) / 14)) * -3;
+        var n = c.titleSprites.length, x = RPG.W / 2 - n * 17 + i * 34 - 2, y = 150 + Math.abs(Math.sin((RPG.frame + i * 20) / 14)) * -3;
         g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(x + 16, 182, 12, 3, 0, 0, Math.PI * 2); g.fill();
         RPG.drawSprite(s.sprite, x, y, { pose: 'down', frame: Math.floor(RPG.frame / 20) % 2, scale: 2, palette: s.palette });
       });
@@ -106,12 +106,33 @@
       RPG.text(RPG.t('game.gameOver'), RPG.W / 2, 90, { size: 18, bold: true, align: 'center', color: '#ff8080' });
     }
   };
+  // a big card over the screen: small text on top, a big title, an optional line under it
+  RPG.chapterCard = function (top, big, sub) {
+    var t = 0;
+    RPG.sfx('levelup');
+    return RPG.ui.push({
+      update: function () { t++; if (t > 50 && (RPG.input.take('ok') || t > 260)) this.close(); },
+      draw: function () {
+        var g = RPG.ctx, a = Math.min(1, t / 20);
+        g.globalAlpha = a * 0.82; g.fillStyle = '#1a1438'; g.fillRect(0, 0, RPG.W, RPG.H); g.globalAlpha = a;
+        var gr = g.createLinearGradient(0, 70, 0, 170); gr.addColorStop(0, 'rgba(255,180,220,0)'); gr.addColorStop(0.5, 'rgba(255,180,220,0.18)'); gr.addColorStop(1, 'rgba(255,180,220,0)');
+        g.fillStyle = gr; g.fillRect(0, 70, RPG.W, 100);
+        for (var i = 0; i < 14; i++) RPG.star(g, (i * 53 + t * 0.3) % RPG.W, 30 + (i * 37) % 180, 0.8 + (i % 3) * 0.5, 'rgba(255,240,180,' + (0.3 + 0.3 * Math.sin(t / 10 + i)) + ')');
+        RPG.text(top, RPG.W / 2, 92, { size: 12, align: 'center', color: '#ffd0e8' });
+        RPG.text(big, RPG.W / 2, 110, { size: 20, bold: true, align: 'center', color: '#fff4c0' });
+        if (sub) RPG.wrap(sub, RPG.W - 60, 10).forEach(function (ln, k) { RPG.text(ln, RPG.W / 2, 146 + k * 14, { size: 10, align: 'center', color: '#d8d0f8' }); });
+        g.globalAlpha = 1;
+      }
+    });
+  };
+
   RPG.ending = async function () {
     await RPG.fadeOut(40);
     RPG.go('ending');
     await RPG.fadeIn(40);
-    var lines = RPG.db.config.ending || [];
+    var c = RPG.db.config, lines = c.ending || [];
     for (var i = 0; i < lines.length; i++) { RPG.scenes.ending.line = i; await RPG.ui.push({ update: function () { if (RPG.input.take('ok')) this.close(); } }); }
+    if (c.endingCard) await RPG.chapterCard(RPG.t(c.endingCard.top), RPG.t(c.endingCard.big), c.endingCard.sub && RPG.t(c.endingCard.sub));
     await RPG.fadeOut(30);
     RPG.go('title');
     await RPG.fadeIn(20);

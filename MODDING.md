@@ -85,14 +85,27 @@ RPG.add('characters', {
 // 文字： character: { mia: { name: 'Mia', title: '同學・躲避球女王', bio: '自我介紹，會顯示在狀態畫面。' } }
 ```
 
-讓角色加入隊伍：在任何腳本裡寫 `{ join: 'mia' }`。
-走路的圖可以用現成的小孩模板換顏色（`js/data/sprites.js`）：
+讓角色加入隊伍：在任何腳本裡寫 `{ join: 'mia' }`。隊伍人數不限，但**前 4 位上場戰鬥**（`RPG.MAX_ACTIVE`），
+其他人待命、得到一半經驗值；玩家可以在選單的「隊伍」換順序。
+
+### 角色的圖（Q 版小人）`js/data/sprites.js`
+
+人物用 `RPG.chibi` 畫：大頭、閃亮的眼睛、腮紅，自動有走路動畫和三個方向。只要選髮型和顏色：
 
 ```js
 RPG.add('sprites', {
-  mia: RPG.walker(RPG.KID, { H: '#c89040', S: '#f0c49a', K: '#202020', M: '#b04030', T: '#e05a8a', P: '#5a3a6a', B: '#3a2a1a', G: '#e05a8a' })
+  zoe: RPG.chibi({ hair: 'pony', mouth: 'smile' }, { H: '#c89040', T: '#e05a8a', P: '#5a3a6a', A: '#80d0ff' })
 });
 ```
+
+| 選項 | 可以用 |
+|---|---|
+| `hair` | `'short'`、`'cap'`（H = 帽子顏色、h = 帽子下的頭髮）、`'pony'` 馬尾、`'bob'` 鮑伯頭、`'spiky'` 刺刺頭、`'bun'` 包包頭、`'bald'` 光頭、`'hood'` 動物帽 |
+| `mouth` | `'smile'`、`'grin'`（缺一顆牙）、`'open'`、`'flat'` |
+| 其他 | `glasses: true` 眼鏡、`mustache: true` 鬍子、`adult: true` 大人身材、`pack: false` 不背書包 |
+| 顏色 | H 頭髮、S 皮膚、K 眼睛、I 瞳孔、M 嘴巴、T 上衣、P 褲子、B 鞋子、G 書包、A 點綴（髮圈、眼鏡） |
+
+NPC 可以在 maps.js 用 `palette: { T: '#ff0000' }` 換衣服顏色。
 
 ## 技能（魔法、招式）`js/data/skills.js`
 
@@ -187,11 +200,23 @@ RPG.add('troops', {
 // 文字： enemy: { skunk: { name: '臭鼬', defeat: '{name} 臭臭地逃走了！' } },  troop: { skunkBoss: { intro: '臭鼬老大擋住了去路！' } }
 ```
 
-敵人的圖（16×16，兩個影格）加在 `sprites.js`：
+敵人的圖用 `RPG.monster` 畫在 32×32 的格子上（每個遊戲像素 = 2 格，所以臉可以很細）。
+`f` 是影格（0 或 1，會自動輪流），`c` 是調色盤：
 
 ```js
-RPG.add('sprites', { skunk: { palette: { K: '#202020', W: '#ffffff' }, frames: { idle: [frameA, frameB] } } });
+RPG.add('sprites', {
+  skunk: RPG.monster(function (P, f, c) {
+    P.ball(24, 14 - f, 6, 9, c.W);                 // 蓬蓬的尾巴（ball = 自動有亮面和暗面的圓）
+    P.ball(14, 20, 9, 7, c.K);                     // 身體
+    P.rect(12, 13, 4, 10, c.W);                    // 白色條紋
+    P.eye(10, 17, 3, 4, '#2a1c24'); P.eye(17, 17, 3, 4, '#2a1c24');   // 有亮點的大眼睛
+    P.blush(8, 22); P.blush(20, 22);               // 腮紅
+  }, { K: '#3a3048', W: '#ffffff' })
+});
 ```
+
+工具：`P.set(x, y, 色)`、`P.rect`、`P.oval`、`P.ball`、`P.poly([[x,y],...], 色)`、`P.line`、`P.eye`、`P.blush`，
+`RPG.color.shade(色, ±0.3)` 調亮或調暗。也可以用舊的方式一格一格打字（`frames: { idle: [rows, rows] }`）。
 
 ## 地圖與劇情 `js/data/maps.js`
 
@@ -257,7 +282,10 @@ RPG.add('maps', {
 | 隊伍 | `{ join: 'mochi' }`、`{ leave: 'mochi' }`、`{ heal: true }` |
 | 移動 | `{ warp: 'mapId', x: 3, y: 4, dir: 'up' }` |
 | NPC | `{ hide: 'npcId' }`、`{ show: 'npcId' }` |
+| 章節 | `{ chapter: 2 }`（顯示章節標題卡，文字在 `chapter.2.title` / `.name` / `.short`） |
 | 其他 | `{ wait: 30 }`、`{ sfx: 'item' }`、`{ toast: 'beach.tip' }`、`{ ending: true }`、`{ call: function (ctx) { ... } }` |
+
+任何指令旁邊加上 `if`，就只有條件成立時才執行：`{ say: 'cave.king.mochi', name: 'mochi', if: { member: 'mochi' } }`。
 
 條件（`if`、NPC 的 `showIf` / `hideIf`、傳送點和事件的 `if`）可以是：
 `'flag'`、`'!flag'`、`{ item: 'cookie', count: 2 }`、`{ gold: 100 }`、`{ member: 'mochi' }`、陣列（全部成立）、或函式。
@@ -305,5 +333,5 @@ RPG.add('shops', {
 ## 遊戲設定 `js/data/config.js`
 
 `RPG.config({ ... })` 裡可以改：開始地圖與位置、初始隊伍、初始金錢與道具、經驗值曲線 `expCurve(level)`、
-開場劇情 `intro`（腳本）、結局 `ending`（key 陣列，一個 key 一頁），以及傷害公式 `damage(user, target, effect)`
+開場劇情 `intro`（腳本）、結局 `ending`（key 陣列，一個 key 一頁）、結局後的卡片 `endingCard: { top, big, sub }`，以及傷害公式 `damage(user, target, effect)`
 （不寫就用 `js/effects.js` 的預設公式）。標題文字在語言檔的 `game.title`、`game.subtitle`。

@@ -57,6 +57,16 @@
     bark: { frames: 20, sfx: 'hit', draw: function (g, x, y, p) { for (var i = 0; i < 3; i++) ring(g, x + 20, y, 6 + i * 7 + p * 10, 'rgba(255,255,255,' + (1 - p) * 0.8 + ')', 1.5); } },
     goo: { frames: 20, sfx: 'hit', draw: function (g, x, y, p) { g.fillStyle = 'rgba(110,210,80,' + (1 - p) + ')'; g.beginPath(); g.ellipse(x, y + p * 6, 14 * p + 4, 8 * p + 3, 0, 0, 7); g.fill(); } },
     slam: { frames: 22, sfx: 'crit', draw: function (g, x, y, p) { ring(g, x, y + 10, p * 30, 'rgba(255,200,120,' + (1 - p) + ')', 4); } },
+    stars: { frames: 26, sfx: 'magic', draw: function (g, x, y, p) {
+      for (var i = 0; i < 6; i++) { var a = i / 6 * Math.PI * 2 + p * 2, r = 4 + p * 18; RPG.star(g, x + Math.cos(a) * r, y + Math.sin(a) * r - p * 6, 1.6 * (1 - p) + 0.4, 'rgba(255,230,140,' + (1 - p) + ')'); }
+    } },
+    bubbles: { frames: 28, sfx: 'magic', draw: function (g, x, y, p) {
+      for (var i = 0; i < 7; i++) {
+        var bx = x - 14 + i * 5 + Math.sin(p * 8 + i) * 2, by = y + 10 - p * 28 - (i % 3) * 5;
+        g.strokeStyle = 'rgba(190,240,255,' + (1 - p) + ')'; g.lineWidth = 1; g.beginPath(); g.arc(bx, by, 2 + (i % 2), 0, Math.PI * 2); g.stroke();
+        g.fillStyle = 'rgba(255,255,255,' + (1 - p) + ')'; g.fillRect(bx - 1, by - 1.5, 1, 1);
+      }
+    } },
     zzz: { frames: 26, sfx: 'magic', draw: function (g, x, y, p) { RPG.text('Z', x - 6 + p * 8, y - 6 - p * 18, { size: 10, bold: true, color: 'rgba(200,220,255,' + (1 - p) + ')' }); RPG.text('z', x + 4, y - p * 12, { size: 8, color: 'rgba(200,220,255,' + (1 - p) + ')' }); } }
   });
 

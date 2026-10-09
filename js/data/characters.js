@@ -31,6 +31,20 @@
       growth: { maxHp: 7, maxMp: 2.4, atk: 2.2, def: 1.2, mag: 1, spd: 1.8, luck: 1.2 },
       learn: { 1: ['nibble', 'lick'], 4: ['bark'], 6: ['puppyEyes'], 9: ['zoomies'] },
       equip: { armor: 'dogVest' }
+    },
+    mia: {
+      sprite: 'mia', level: 4,
+      base:   { maxHp: 46, maxMp: 12, atk: 12, def: 6, mag: 5, spd: 13, luck: 8 },
+      growth: { maxHp: 8.2, maxMp: 2.2, atk: 2.5, def: 1.4, mag: 0.9, spd: 1.9, luck: 1 },
+      learn: { 1: ['quickThrow'], 4: ['doubleThrow'], 6: ['pepRally'], 9: ['cannonball'], 12: ['ballStorm'] },
+      equip: { weapon: 'dodgeball', armor: 'jacket' }
+    },
+    ethan: {
+      sprite: 'ethan', level: 6,
+      base:   { maxHp: 40, maxMp: 20, atk: 7, def: 7, mag: 13, spd: 7, luck: 7 },
+      growth: { maxHp: 7.2, maxMp: 4.2, atk: 1.3, def: 1.6, mag: 2.7, spd: 1.1, luck: 0.9 },
+      learn: { 1: ['zap', 'fixIt'], 6: ['waterJet'], 7: ['shieldBot'], 9: ['sciFog'], 12: ['teslaCoil'] },
+      equip: { weapon: 'screwdriver', armor: 'labCoat' }
     }
   });
 })();

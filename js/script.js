@@ -6,7 +6,8 @@
  *     { say: ['school.leo.1', 'school.leo.2'] },                      // several pages
  *     { if: { item: 'cookie' }, then: [ { take: 'cookie' }, { join: 'mochi' } ], else: [ { say: '...' } ] },
  *     { choice: ['street.mochi.give', 'street.mochi.pet'], then: [ [...], [...] ] },
- *     { battle: 'raccoonKing', win: [...], lose: [...] } ]
+ *     { battle: 'raccoonKing', win: [...], lose: [...] },
+ *     { say: 'cave.king.mochi', name: 'mochi', if: { member: 'mochi' } } ]       // if next to a command = only when true
  *
  * Add a command:  RPG.commands.myCommand = async function (cmd, ctx) { ... }   (return 'stop' to end the script)
  */
@@ -32,7 +33,10 @@
     for (var i = 0; i < script.length; i++) {
       var cmd = script[i];
       if (typeof cmd === 'string') cmd = { say: cmd };
-      var key = Object.keys(cmd).filter(function (k) { return RPG.commands[k]; })[0];
+      // { say: '...', if: { member: 'mia' } } — 'if' next to another command only lets it run when true
+      var guard = 'if' in cmd && !('then' in cmd) && !('else' in cmd);
+      if (guard && !RPG.check(cmd['if'])) continue;
+      var key = Object.keys(cmd).filter(function (k) { return RPG.commands[k] && !(guard && k === 'if'); })[0];
       if (!key) { console.warn('RPG: unknown script command', cmd); continue; }
       var r = await RPG.commands[key](cmd, ctx);
       if (r === 'stop') return 'stop';
@@ -103,6 +107,11 @@
   C.sfx = async function (c) { RPG.sfx(c.sfx); };
   C.toast = async function (c) { RPG.ui.toast(RPG.say(c.toast), c.color); };
   C.ending = async function () { await RPG.ending(); return 'stop'; };
+  // { chapter: 2 } — a title card; the chapter's texts are chapter.<n>.title / .name / .short
+  C.chapter = async function (c) {
+    RPG.state.chapter = c.chapter;
+    await RPG.chapterCard(RPG.t('chapter.' + c.chapter + '.title'), RPG.t('chapter.' + c.chapter + '.name'));
+  };
   C.call = async function (c, ctx) { return c.call(ctx); };   // escape hatch: { call: function (ctx) { ... } }
 
   RPG.healParty = function () {

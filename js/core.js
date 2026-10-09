@@ -86,6 +86,10 @@
   };
   RPG.member = function (id) { return RPG.state.members[id]; };
   RPG.party = function () { return RPG.state.party.map(function (id) { return RPG.state.members[id]; }); };
+  // up to MAX_ACTIVE members fight; the rest wait in reserve (change the order in the menu: Party)
+  RPG.MAX_ACTIVE = 4;
+  RPG.activeParty = function () { return RPG.party().slice(0, RPG.MAX_ACTIVE); };
+  RPG.isReserve = function (m) { return RPG.state.party.indexOf(m.id) >= RPG.MAX_ACTIVE; };
   // returns a list of { level, learned: [skill ids] } for every level gained
   RPG.gainExp = function (m, n) {
     var ups = [], max = RPG.db.config.maxLevel || 50;
