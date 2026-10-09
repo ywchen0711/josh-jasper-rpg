@@ -130,7 +130,9 @@
     await RPG.fadeOut(40);
     RPG.go('ending');
     await RPG.fadeIn(40);
-    var c = RPG.db.config, lines = c.ending || [];
+    var c = RPG.db.config, lines = (c.ending || []).filter(function (l) { return typeof l === 'string' || RPG.check(l['if']); })
+      .map(function (l) { return typeof l === 'string' ? l : l.text; });
+    RPG.scenes.ending.lines = lines;
     for (var i = 0; i < lines.length; i++) { RPG.scenes.ending.line = i; await RPG.ui.push({ update: function () { if (RPG.input.take('ok')) this.close(); } }); }
     if (c.endingCard) await RPG.chapterCard(RPG.t(c.endingCard.top), RPG.t(c.endingCard.big), c.endingCard.sub && RPG.t(c.endingCard.sub));
     await RPG.fadeOut(30);
@@ -144,7 +146,7 @@
       var g = RPG.ctx;
       if (RPG.db.backdrops.ending) RPG.db.backdrops.ending.draw(g, RPG.frame);
       if (RPG.fx.active()) RPG.fx.post({ bloom: 0.4, grade: 'dusk', vignette: 0.5 });
-      var lines = RPG.db.config.ending || [], ln = RPG.say(lines[this.line] || '');
+      var lines = this.lines || [], ln = RPG.say(lines[this.line] || '');
       RPG.box(20, 150, RPG.W - 40, 70);
       RPG.wrap(ln, RPG.W - 70, 12).forEach(function (s, i) { RPG.text(s, 34, 162 + i * 16, { size: 12 }); });
     }

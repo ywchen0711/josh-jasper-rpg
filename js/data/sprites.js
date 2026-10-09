@@ -257,6 +257,9 @@
     nurse:     chibi({ adult: true, pack: false, hair: 'bun' }, { H: '#2a1a10', T: '#f4f4f4', P: '#9ad0f0', A: '#e04060' }),
     librarian: chibi({ adult: true, pack: false, hair: 'bun', glasses: true }, { H: '#8a5a2a', T: '#9a5ac8', P: '#3a3a4a', A: '#5a3a2a' }),
     oldman:    chibi({ adult: true, pack: false, hair: 'bald', mustache: true }, { H: '#e8e8ec', S: SKIN, T: '#8a6a4a', P: '#4a4a4a' }),
+    dad:       chibi({ adult: true, pack: false, hair: 'cap' }, { H: '#4a3220', h: '#3a2818', S: SKIN, T: '#f0c840', P: '#3a3a4a', B: '#2a2a2a' }),
+    // the hidden boss: Dad's outline in the dark, with glowing eyes
+    jeffShadow: RPG.silhouette(chibi({ adult: true, pack: false, hair: 'cap' }, { H: '#4a3220' }), { eyes: [[11, 10], [19, 10]] }),
     capAdult:  chibi({ adult: true, pack: false, hair: 'cap' }, { H: '#d84040', h: '#2a2a2a', T: '#d84040', P: '#2a2a3a' }),
     coyote:    chibi({ hair: 'hood' }, { H: '#b88a5a', S: SKIN, T: '#2a64b8', P: '#2a64b8', B: '#3a2a1a', G: '#2a64b8', A: '#f4c8a0' }),
     // ---- things ----

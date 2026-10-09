@@ -23,6 +23,7 @@
     scared: { color: '#ffe080', turns: 1, skipTurn: true },
     sticky: { color: '#80e060', turns: 4, perTurn: { percent: 0.07 } },
     sad:    { color: '#80a0ff', turns: 3, stats: { atk: 0.7 } },
+    giggle: { color: '#ffb0d0', turns: 2, skipTurn: 0.6 },
     pumped: { color: '#ffb060', turns: 3, stats: { atk: 1.25, spd: 1.2 } }
   });
 
@@ -92,6 +93,11 @@
     bucketBash: { target: 'enemy', anim: 'slam', effects: [{ type: 'damage', power: 1.45 }] },
     hunker:     { target: 'self', anim: 'shine', effects: [{ type: 'buff', stat: 'def', mult: 1.5, turns: 2 }] },
     gullDive:   { target: 'enemy', mp: 4, anim: 'slam', effects: [{ type: 'damage', power: 1.6 }] },
+    // ---- Jeff, the shadow in the hills ----
+    dadJoke:    { target: 'enemies', mp: 4, anim: 'stars', effects: [{ type: 'status', status: 'giggle', chance: 0.45 }] },
+    tickle:     { target: 'enemy', anim: 'claw', effects: [{ type: 'damage', power: 1.1 }, { type: 'status', status: 'giggle', chance: 0.3 }] },
+    grounded:   { target: 'enemy', mp: 5, anim: 'slam', effects: [{ type: 'damage', power: 1.75 }] },
+    coffeeBreak:{ target: 'self', mp: 6, anim: 'heal', effects: [{ type: 'heal', percent: 0.15 }, { type: 'buff', stat: 'atk', mult: 1.25, turns: 2 }] },
     feast:      { target: 'self', mp: 6, anim: 'heal', effects: [{ type: 'heal', percent: 0.18 }, { type: 'buff', stat: 'atk', mult: 1.2, turns: 2 }] }
   });
 })();

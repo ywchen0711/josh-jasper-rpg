@@ -59,7 +59,11 @@
       npcs: [
         { id: 'mom', x: 11, y: 2, sprite: 'mom', name: 'mom', dir: 'left', script: [
           { if: 'got_trophy', then: [{ say: 'home.mom.trophy' }], 'else': [{ say: 'home.mom.rest' }] },
+          { say: 'home.mom.jeff', 'if': 'jeff_done' },
           { inn: 0, text: 'home.mom.rested' }
+        ] },
+        { id: 'dad', x: 3, y: 4, sprite: 'dad', name: 'dad', dir: 'right', showIf: 'jeff_done', script: [
+          { if: 'got_trophy', then: [{ say: 'home.dad.proud' }], 'else': [{ say: ['home.dad.home1', 'home.dad.home2'] }] }
         ] }
       ],
       events: [
@@ -150,13 +154,32 @@
           ], 'else': [{ say: 'street.mochi.hungry', name: null }] }
         ] },
         { id: 'oldman', x: 30, y: 13, sprite: 'oldman', name: 'oldman', wander: 3, script: [
-          { say: 'street.oldman' }
+          { say: 'street.oldman' },
+          { say: 'street.oldmanShadow', 'if': ['quest', '!jeff_done'] }
         ] },
         { id: 'kid1', x: 26, y: 13, sprite: 'kid', palette: PAL.kidA, name: 'neighborKid', wander: 2, script: [
           { say: ['street.kid.1', 'street.kid.2'] }
         ] },
         { id: 'jogger', x: 25, y: 24, sprite: 'adult', palette: PAL.kidC, name: 'jogger', wander: 4, script: [
           { say: 'street.jogger' }
+        ] },
+        // the hidden mini-boss: a shadow in the far corner of the east hills, once the adventure has started
+        { id: 'shadow', x: 58, y: 43, sprite: 'jeffShadow', name: 'shadow', dir: 'left', showIf: 'quest', hideIf: 'jeff_done', script: [
+          { say: 'street.jeff.appear', name: null },
+          { say: ['street.jeff.who1', 'street.jeff.who2'] },
+          { say: 'street.jeff.josh', name: 'josh' },
+          { say: 'street.jeff.challenge' },
+          { battle: 'jeff', win: [
+            { say: 'street.jeff.laugh' },
+            { say: 'street.jeff.unmask', name: null },
+            { say: 'street.jeff.joshDad', name: 'josh' },
+            { say: 'street.jeff.jasperDad', name: 'jasper' },
+            { say: ['street.jeff.reveal1', 'street.jeff.reveal2'], name: 'dad' },
+            { say: 'street.jeff.mochi', name: null, 'if': { member: 'mochi' } },
+            { give: 'dadTie' },
+            { say: 'street.jeff.bye', name: 'dad' },
+            { set: 'jeff_done' }
+          ], lose: [{ say: 'street.jeff.won' }] }
         ] },
         { id: 'iceCream', x: 19, y: 29, sprite: 'capAdult', palette: PAL.truck, name: 'iceCream', script: [
           { say: 'street.iceCream' }, { shop: 'iceCreamTruck' }

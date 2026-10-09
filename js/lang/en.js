@@ -384,3 +384,41 @@ RPG.addText('en', {
     king: { mochi: '(Mochi wags happily, and the Raccoon King can\'t help giving him a pat on the head.)' }
   }
 });
+
+// ======================= the hidden boss: Jeff =======================
+RPG.addText('en', {
+  npc: { shadow: '???', dad: 'Dad (Jeff)' },
+  enemy: { jeff: { name: 'Mysterious Shadow', defeat: '{name} throws up his hands: "Okay, okay, I give up!"' } },
+  troop: { jeff: { intro: 'The shadow\'s eyes flash... "Let\'s see how strong you really are!"' } },
+  status: { giggle: { name: 'Giggling', short: 'Ha', skip: "{name} can't stop giggling!" } },
+  skill: { dadJoke: { name: 'Dad Joke' }, tickle: { name: 'Tickle Attack' }, grounded: { name: "You're Grounded!" }, coffeeBreak: { name: 'Coffee Break' } },
+  item: { dadTie: { name: "Dad's Lucky Tie", desc: 'Attack +4, Defense +4, Luck +4, HP +15. Has a coffee stain.' } },
+  ending: { dad: 'Dad (Jeff) quietly hung the shadow cloak back in the closet and said he would test them again next year. Mom said: "Do the dishes first."' },
+  home: {
+    mom: { jeff: 'I heard you met a strange shadow up in the hills? ...I KNEW something was up when he said he was "going for a walk."' },
+    dad: {
+      home1: 'Heh heh, I bought that cloak for Halloween. Pretty spooky, huh?',
+      home2: "You're stronger than I thought. Go on, get that trophy back!",
+      proud: "You really got the trophy back! That's my boys. Pizza for dinner tonight!"
+    }
+  },
+  street: {
+    oldmanShadow: 'Oh, and... lately at dusk there is a strange dark figure standing in the far corner of the east hills. It never moves. Be careful.',
+    jeff: {
+      appear: '(In the very corner of the grass stands a pitch-black shadow. Two eyes glow...)',
+      who1: '...At last. I have been waiting for you.',
+      who2: 'You want to beat the Raccoon King? Get past me first.',
+      josh: 'W-who are you!? That voice sounds familiar...',
+      challenge: 'Enough talk! Show me what you can really do!',
+      laugh: 'Ha... ha ha ha! Okay, okay, you win!',
+      unmask: '(The shadow pulls off its cloak and cap...)',
+      joshDad: 'DAD!?',
+      jasperDad: 'Jeff!? I mean... DAD!? What are you doing here!',
+      reveal1: 'You caught me! I heard you were going after the Raccoon King, so I wanted to make sure you were ready.',
+      reveal2: "And you hit me pretty hard... you've really grown up.",
+      mochi: '(Mochi wags like crazy and jumps on Dad to lick his face.)',
+      bye: "This tie is my lucky charm. You can borrow it. Be home before dinner!",
+      won: "Ha ha, almost! Practice a little more. (The shadow pats your heads and goes back to its corner.)"
+    }
+  }
+});

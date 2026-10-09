@@ -27,8 +27,8 @@
       { say: 'intro.7' }
     ],
 
-    // ending pages (text keys)
-    ending: ['ending.1', 'ending.2', 'ending.3', 'ending.7', 'ending.4', 'ending.8'],
+    // ending pages (text keys; { text, if } shows a page only when the condition is true)
+    ending: ['ending.1', 'ending.2', 'ending.3', 'ending.7', 'ending.4', { text: 'ending.dad', 'if': 'jeff_done' }, 'ending.8'],
     // the card after the ending: "Chapter 1 complete" and a peek at what's next
     endingCard: { top: 'chapter.1.end', big: 'chapter.1.name', sub: 'chapter.2.teaser' },
 

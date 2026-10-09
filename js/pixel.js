@@ -292,6 +292,39 @@
     P.oy = 0;
   }
 
+  // ======================= silhouettes =======================
+  // any painted sprite as a dark shadow figure with a faint rim of light, drifting wisps and glowing eyes
+  //   RPG.silhouette(RPG.chibi({ adult: true, hair: 'cap' }), { eyes: [[11, 10], [19, 10]] })
+  // eyes: where the eyes are on the front view (2x3 pixels each); battle sprites use the front view
+  RPG.silhouette = function (base, o) {
+    o = o || {};
+    var body = o.color || '#1a1430', rim = o.rim || '#4a3a78', glow = o.glow || '#fff1a8';
+    return { w: base.w, h: base.h, palette: base.palette, outline: false,
+      paint: function (P, pose, f, c) {
+        var front = pose !== 'up' && pose !== 'side';
+        base.paint(P, front ? 'down' : pose, f, c);
+        var w = P.w, h = P.h, src = P.px.slice();
+        for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) {
+          if (!src[y * w + x]) continue;
+          var edge = !src[y * w + x - 1] || !src[y * w + x + 1] || !src[(y - 1) * w + x] || x === 0 || x === w - 1;
+          P.px[y * w + x] = edge && (y < h * 0.6 || x < w / 2) ? rim : body;
+        }
+        var s = 7 + f * 13;                                // smoke drifting off the shoulders and head
+        for (var i = 0; i < 9; i++) {
+          s = (s * 9301 + 49297) % 233280;
+          var wx = 6 + s % 20, wy = (s >> 4) % 12 + (f ? 0 : 2);
+          if (!P.px[wy * w + wx]) P.px[wy * w + wx] = i % 3 ? 'rgba(60,40,110,0.55)' : 'rgba(110,80,180,0.45)';
+        }
+        if (front && o.eyes) {
+          var dy = f ? -1 : 0;
+          o.eyes.forEach(function (e) {
+            P.rect(e[0], e[1] + dy, 2, 3, glow); P.set(e[0], e[1] + dy, '#ffffff');
+            P.set(e[0] - 1, e[1] + 1 + dy, 'rgba(255,240,160,0.45)'); P.set(e[0] + 2, e[1] + 1 + dy, 'rgba(255,240,160,0.45)');
+          });
+        } else if (pose === 'side' && o.eyes) P.rect(21, o.eyes[0][1] + (f ? -1 : 0), 2, 3, glow);
+      } };
+  };
+
   // ======================= monsters =======================
   RPG.monster = function (paint, palette, size) {
     return { w: size || 16, h: size || 16, palette: palette || {}, paint: function (P, pose, f, c) { paint(P, f % 2, c); P.oy = 0; P.ox = 0; } };

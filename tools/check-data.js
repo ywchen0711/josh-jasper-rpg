@@ -105,7 +105,7 @@ Object.values(db.shops).forEach((s) => s.items.forEach((i) => need('items', i, `
 db.config.startParty.forEach((c) => need('characters', c, 'config.startParty'));
 need('maps', db.config.startMap, 'config.startMap');
 checkScript(db.config.intro, 'config.intro');
-(db.config.ending || []).forEach((k) => text(k, 'config.ending'));
+(db.config.ending || []).forEach((k) => text(typeof k === 'string' ? k : k.text, 'config.ending'));
 if (db.config.endingCard) Object.values(db.config.endingCard).forEach((k) => text(k, 'config.endingCard'));
 
 // names and descriptions of everything in the database

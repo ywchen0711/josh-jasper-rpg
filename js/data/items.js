@@ -60,6 +60,7 @@
     friendBracelet: { type: 'accessory', price: 120, stats: { luck: 5, maxHp: 15 } },
     comfySocks:  { type: 'accessory', price: 70, stats: { maxHp: 20, def: 2 } },
     bandana:     { type: 'accessory', price: 65, stats: { atk: 3, spd: 3 }, equipBy: ['mochi'] },
+    dadTie:      { type: 'accessory', price: 0, stats: { atk: 4, def: 4, luck: 4, maxHp: 15 } },
     superCape:   { type: 'accessory', price: 0, stats: { spd: 6, luck: 4, atk: 2 } },
     coyoteBadge: { type: 'accessory', price: 0, stats: { atk: 3, def: 3, mag: 3, spd: 3, luck: 3, maxHp: 10 } },
 
