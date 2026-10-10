@@ -14,6 +14,8 @@
 
   var saved = null;
   try { saved = localStorage.getItem('jjrpg.lang'); } catch (e) { /* private mode */ }
+  var fromLobby = (typeof location !== 'undefined' && (location.search.match(/[?&]lang=(zh|en)(?![a-z])/) || [])[1]);   // the lobby opens games with ?lang=zh|en
+  if (fromLobby) { saved = fromLobby; try { localStorage.setItem('jjrpg.lang', saved); } catch (e) { /* private mode */ } }
   RPG.lang = saved || (typeof navigator !== 'undefined' && navigator.language && !/^zh/i.test(navigator.language) ? 'en' : 'zh');
 
   // nested objects are flattened to dotted keys: { ui: { yes: 'Yes' } } -> 'ui.yes'
