@@ -126,6 +126,9 @@
   }
   function cactus(g, x, y) { g.fillStyle = '#3a8a4a'; g.fillRect(x, y - 24, 6, 26); g.fillRect(x - 6, y - 14, 6, 4); g.fillRect(x - 6, y - 20, 3, 8); g.fillStyle = '#6ac070'; g.fillRect(x + 1, y - 23, 1, 24); }
 
+  // shared with other data files (chapter2.js): RPG.bd.sky(g, top, bottom, horizon) ...
+  RPG.bd = { sky: sky, sun: sun, clouds: clouds, hills: hills, haze: haze, floor: floor, rays: rays, tree: tree };
+
   RPG.add('backdrops', {
     'default': { grade: 'warm', draw: function (g, t) {
       sky(g, '#5aa8f0', '#d0ecff'); sun(g, 250, 36, 12, '#fff8d8', 'rgba(255,250,210,0.5)'); clouds(g, 40, t, 'rgba(255,255,255,0.75)');

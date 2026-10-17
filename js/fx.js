@@ -3,8 +3,8 @@
  * bloom, light sources in the dark, drifting particles, color grading and a vignette.
  * Turn them off in the settings (or automatically when the browser can't filter canvases).
  *
- * A map can set:  ambient: 0..1 (darkness), lights: [{ x, y, r, color }], particles: 'leaves' | 'dust' | 'fireflies' | 'motes',
- *                 grade: 'warm' | 'cool' | 'dusk' | 'night'.  A tile can set light: { r, color } (see tiles.js).
+ * A map can set:  ambient: 0..1 (darkness), lights: [{ x, y, r, color }], particles: 'leaves' | 'dust' | 'fireflies' | 'motes' | 'fog',
+ *                 grade: 'warm' | 'cool' | 'dusk' | 'night' | 'mist'.  A tile can set light: { r, color } (see tiles.js).
  */
 (function () {
   'use strict';
@@ -90,7 +90,8 @@
   // ---- color grading and vignette ----
   var GRADES = {
     warm: ['rgba(255,190,110,0.10)', 'soft-light'], cool: ['rgba(110,150,255,0.12)', 'soft-light'],
-    dusk: ['rgba(255,120,80,0.16)', 'soft-light'], night: ['rgba(40,60,160,0.22)', 'multiply'], none: null
+    dusk: ['rgba(255,120,80,0.16)', 'soft-light'], night: ['rgba(40,60,160,0.22)', 'multiply'],
+    mist: ['rgba(150,170,210,0.16)', 'screen'], none: null
   };
   FX.grade = function (name) {
     var gd = GRADES[name || 'warm']; if (!gd) return;
@@ -144,7 +145,7 @@
   function hash(i, s) { var x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453; return x - Math.floor(x); }
   FX.particles = function (kind, camX, camY, ww, wh, frame) {
     if (!kind) return;
-    var g = RPG.ctx, n = { leaves: 22, dust: 40, fireflies: 26, motes: 34 }[kind] || 20;
+    var g = RPG.ctx, n = { leaves: 22, dust: 40, fireflies: 26, motes: 34, fog: 16 }[kind] || 20;
     g.save();
     for (var i = 0; i < n; i++) {
       var t = frame / 60, x, y, a;
@@ -155,6 +156,13 @@
         x += Math.sin(t * 1.5 + i) * 6;
         g.fillStyle = ['#e8a040', '#c86a30', '#a8c050'][i % 3]; g.globalAlpha = 0.85;
         g.save(); g.translate(x, y); g.rotate(t * 2 + i); g.fillRect(-1.5, -0.8, 3, 1.6); g.restore();
+      } else if (kind === 'fog') {                    // big soft banks of mist rolling in from the sea
+        var r = 40 + hash(i, 10) * 50;
+        x = ((hash(i, 11) * (ww + r * 2) + t * (4 + hash(i, 12) * 5) - camX * 0.35) % (ww + r * 2) + ww + r * 2) % (ww + r * 2) - r;
+        y = ((hash(i, 13) * (wh + r * 2) + Math.sin(t * 0.3 + i) * 10 - camY * 0.35) % (wh + r * 2) + wh + r * 2) % (wh + r * 2) - r;
+        a = 0.16 + 0.1 * Math.sin(t * 0.5 + i * 1.3);
+        var fg = g.createRadialGradient(x, y, 0, x, y, r); fg.addColorStop(0, 'rgba(226,232,244,' + a + ')'); fg.addColorStop(1, 'rgba(226,232,244,0)');
+        g.fillStyle = fg; g.fillRect(x - r, y - r, r * 2, r * 2);
       } else if (kind === 'fireflies') {
         x = (hash(i, 4) * ww + Math.sin(t * 0.7 + i) * 18 - camX * 0.1 + ww * 2) % ww;
         y = (hash(i, 5) * wh + Math.cos(t * 0.9 + i * 2) * 12 - camY * 0.1 + wh * 2) % wh;

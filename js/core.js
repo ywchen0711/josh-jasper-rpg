@@ -64,6 +64,8 @@
     var st = RPG.stats(m); m.hp = st.maxHp; m.mp = st.maxMp;
     return m;
   };
+  // everything up to the member's level (catches up on skills added to earlier levels in a later chapter)
+  RPG.learnUpTo = function (m) { var got = []; for (var lv = 1; lv <= m.level; lv++) got = got.concat(learnAt(m, lv)); return got; };
   function learnAt(m, lv) {
     var def = RPG.get('characters', m.id), list = (def.learn && def.learn[lv]) || [], got = [];
     list.forEach(function (sk) { if (m.skills.indexOf(sk) < 0) { m.skills.push(sk); got.push(sk); } });
@@ -99,7 +101,7 @@
       m.level++;
       var after = RPG.stats(m);
       m.hp += after.maxHp - before.maxHp; m.mp += after.maxMp - before.maxMp;
-      ups.push({ level: m.level, learned: learnAt(m, m.level) });
+      ups.push({ level: m.level, learned: RPG.learnUpTo(m) });
     }
     return ups;
   };
@@ -159,7 +161,12 @@
   RPG.loadSlot = function (slot) {
     try { var s = localStorage.getItem(KEY + slot); return s ? JSON.parse(s) : null; } catch (e) { return null; }
   };
-  RPG.load = function (slot) { var s = RPG.loadSlot(slot); if (s) RPG.state = s; return !!s; };
+  RPG.load = function (slot) {
+    var s = RPG.loadSlot(slot); if (!s) return false;
+    RPG.state = s;
+    Object.keys(s.members).forEach(function (id) { if (RPG.db.characters[id]) RPG.learnUpTo(s.members[id]); });
+    return true;
+  };
   RPG.saveSummary = function (slot) {
     var s = RPG.loadSlot(slot);
     if (!s) return null;

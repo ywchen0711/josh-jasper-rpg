@@ -10,7 +10,8 @@
   'use strict';
   RPG.battle = async function (troopId, opts) {
     opts = opts || {};
-    var prev = RPG.scene, troop = RPG.get('troops', troopId);
+    while (RPG.scene === RPG.scenes.battle && RPG.scenes.battle.b) await RPG.wait(1);    // never start a battle on top of another one
+    var prev = RPG.scene === RPG.scenes.battle ? RPG.scenes.map : RPG.scene, troop = RPG.get('troops', troopId);
     RPG.sfx('encounter');
     for (var i = 0; i < 6; i++) { RPG.fadeAlpha = i % 2 ? 0.8 : 0; await RPG.wait(4); }
     RPG.fadeAlpha = 0;
@@ -21,6 +22,7 @@
     b.cleanup();
     await RPG.fadeOut(14);
     RPG.scene = prev;
+    RPG.scenes.battle.b = null;
     if (result === 'lose') {
       if (!opts.canLose) { RPG.fadeAlpha = 0; await RPG.gameOver(); return 'lose'; }
       RPG.activeParty().forEach(function (m) { m.hp = Math.max(1, m.hp); });

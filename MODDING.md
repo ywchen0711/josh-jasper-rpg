@@ -20,7 +20,18 @@ RPG.add('種類', {
 改完之後執行 `node tools/check-data.js`，它會檢查地圖寬度、圖塊、傳送點、NPC 位置、所有引用（技能、道具、敵人、商店……）是否存在，
 **以及每個用到的文字 key 在每個語言裡都有翻譯**（少了哪一句會直接告訴你）。
 
-如果新增了一個資料檔，記得在 `index.html` 的「game data」區塊加上 `<script>`。
+如果新增了一個資料檔，記得在 `index.html` 的「game data」區塊加上 `<script>`，並加進 `tools/check-data.js` 的檔案清單。
+
+### 一個章節一個檔案
+
+第二章的所有東西（圖、圖塊、背景、技能、道具、敵人、商店、地圖、劇情）都在 `js/data/chapter2.js`，
+文字在 `js/lang/zh.ch2.js` / `js/lang/en.ch2.js`。要做第三章，可以照著同樣的方式開 `chapter3.js`：
+
+- 用 `RPG.add(...)` 新增內容；要改舊地圖的 NPC，就在檔案最後找出來改它的 `script`、`showIf`、`hideIf`，或 `push` 新的 NPC。
+- 舊角色在新章節學新技能：直接加到 `RPG.db.characters.josh.learn[等級]`。已經超過那個等級的存檔，讀檔或下次升級時會自動補學。
+- 章節結局：在 `RPG.config({ endings: { ch3: { pages, card, art, after } } })` 定義，劇情裡用 `{ ending: 'ch3' }` 播放。
+  `after` 是結局後接著在地圖上執行的腳本（例如進入下一章）；沒有 `after` 就回到標題。
+  第一章的結局用 `config.ending` / `endingCard` / `endingAfter`（`endingAfter` 就是第二章的開場）。
 
 ---
 
@@ -258,8 +269,8 @@ RPG.add('maps', {
 | `ambient` | 0～1，環境的暗度（洞窟 0.6、室內 0.2～0.3、戶外 0） |
 | `lights` | `[{ x, y, r, color }]` 光源；x、y、r 以格子為單位，color 寫成 `'rgba(255,200,120,A)'`（A 會被換成亮度） |
 | `playerLight` | 跟著隊伍走的光（半徑幾格），適合洞窟 |
-| `particles` | `'leaves'` 落葉、`'dust'` 塵埃、`'fireflies'` 螢火蟲、`'motes'` 光點 |
-| `grade` | 色調：`'warm'`、`'cool'`、`'dusk'`、`'night'` |
+| `particles` | `'leaves'` 落葉、`'dust'` 塵埃、`'fireflies'` 螢火蟲、`'motes'` 光點、`'fog'` 濃霧 |
+| `grade` | 色調：`'warm'`、`'cool'`、`'dusk'`、`'night'`、`'mist'`（起霧） |
 | `bloom`、`vignette` | 泛光強度、四周暗角（0～1） |
 
 圖塊也可以自己發光：`machine: { light: { r: 2.4, color: 'rgba(120,230,255,A)' }, ... }`。
@@ -283,7 +294,7 @@ RPG.add('maps', {
 | 移動 | `{ warp: 'mapId', x: 3, y: 4, dir: 'up' }` |
 | NPC | `{ hide: 'npcId' }`、`{ show: 'npcId' }` |
 | 章節 | `{ chapter: 2 }`（顯示章節標題卡，文字在 `chapter.2.title` / `.name` / `.short`） |
-| 其他 | `{ wait: 30 }`、`{ sfx: 'item' }`、`{ toast: 'beach.tip' }`、`{ ending: true }`、`{ call: function (ctx) { ... } }` |
+| 其他 | `{ wait: 30 }`、`{ sfx: 'item' }`、`{ toast: 'beach.tip' }`、`{ ending: true }` 或 `{ ending: 'ch2' }`、`{ call: function (ctx) { ... } }` |
 
 任何指令旁邊加上 `if`，就只有條件成立時才執行：`{ say: 'cave.king.mochi', name: 'mochi', if: { member: 'mochi' } }`。
 

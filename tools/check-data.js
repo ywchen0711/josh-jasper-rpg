@@ -10,7 +10,7 @@ vm.runInThisContext(fs.readFileSync(path.join(__dirname, '../js/i18n.js'), 'utf8
 vm.runInThisContext(fs.readFileSync(path.join(__dirname, '../js/pixel.js'), 'utf8'));
 const langDir = path.join(__dirname, '../js/lang');
 fs.readdirSync(langDir).forEach((f) => vm.runInThisContext(fs.readFileSync(path.join(langDir, f), 'utf8'), { filename: f }));
-['sprites', 'tiles', 'visuals', 'skills', 'items', 'characters', 'enemies', 'config', 'maps'].forEach((f) => {
+['sprites', 'tiles', 'visuals', 'skills', 'items', 'characters', 'enemies', 'config', 'maps', 'chapter2'].forEach((f) => {
   vm.runInThisContext(fs.readFileSync(path.join(__dirname, '../js/data/' + f + '.js'), 'utf8'), { filename: f + '.js' });
 });
 const db = RPG.db, problems = [];
@@ -105,8 +105,17 @@ Object.values(db.shops).forEach((s) => s.items.forEach((i) => need('items', i, `
 db.config.startParty.forEach((c) => need('characters', c, 'config.startParty'));
 need('maps', db.config.startMap, 'config.startMap');
 checkScript(db.config.intro, 'config.intro');
-(db.config.ending || []).forEach((k) => text(typeof k === 'string' ? k : k.text, 'config.ending'));
-if (db.config.endingCard) Object.values(db.config.endingCard).forEach((k) => text(k, 'config.endingCard'));
+const endings = Object.assign({ '': { pages: db.config.ending, card: db.config.endingCard, after: db.config.endingAfter } }, db.config.endings || {});
+Object.entries(endings).forEach(([id, e]) => {
+  (e.pages || []).forEach((k) => text(typeof k === 'string' ? k : k.text, `ending ${id}`));
+  if (e.card) Object.values(e.card).forEach((k) => text(k, `ending ${id} card`));
+  checkScript(e.after, `ending ${id} after`);
+  if (e.art) need('backdrops', e.art, `ending ${id}`);
+});
+const walkScripts = (s, fn) => (s || []).forEach((c) => { if (!c || typeof c !== 'object') return; fn(c); ['then', 'else', 'win', 'lose', 'escape'].forEach((k) => { if (c[k]) (c.choice && k === 'then' ? c[k] : [c[k]]).forEach((x) => walkScripts(x, fn)); }); });
+const allScripts = [db.config.intro, ...Object.values(endings).map((e) => e.after)];
+Object.values(db.maps).forEach((m) => { (m.npcs || []).forEach((n) => allScripts.push(n.script)); (m.events || []).forEach((e) => allScripts.push(e.script)); });
+allScripts.forEach((s) => walkScripts(s, (c) => { if (typeof c.ending === 'string' && !endings[c.ending]) bad(`unknown ending "${c.ending}"`); }));
 
 // names and descriptions of everything in the database
 const learnable = new Set();

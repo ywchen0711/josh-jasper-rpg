@@ -106,7 +106,7 @@
   C.wait = async function (c) { await RPG.wait(c.wait); };
   C.sfx = async function (c) { RPG.sfx(c.sfx); };
   C.toast = async function (c) { RPG.ui.toast(RPG.say(c.toast), c.color); };
-  C.ending = async function () { await RPG.ending(); return 'stop'; };
+  C.ending = async function (c) { await RPG.ending(c.ending === true ? null : c.ending); return 'stop'; };   // { ending: true } or { ending: 'ch2' }
   // { chapter: 2 } — a title card; the chapter's texts are chapter.<n>.title / .name / .short
   C.chapter = async function (c) {
     RPG.state.chapter = c.chapter;

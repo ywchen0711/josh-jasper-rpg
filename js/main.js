@@ -54,6 +54,7 @@
       for (;;) {
         var hasSave = [1, 2, 3].some(function (s) { return RPG.loadSlot(s); });
         var i = await RPG.ui.menu({ items: [{ label: RPG.t('ui.newGame') }, { label: RPG.t('ui.continue'), disabled: !hasSave }, { label: RPG.t('ui.settings') }], y: 98, w: 130, cancel: true });
+        RPG.scenes.map.busyN = 0;                         // nothing from a previous game is still running
         if (i === 0) { RPG.newGame(); RPG.go('map'); this.open = false; await RPG.run(RPG.db.config.intro || []); return; }
         if (i === 1) {
           var slot = await RPG.pickSlot(RPG.t('ui.loadWhich'), true);
@@ -126,16 +127,21 @@
     });
   };
 
-  RPG.ending = async function () {
+  // id = a key of config.endings ({ pages, card, after }); no id = config.ending / endingCard / endingAfter.
+  // `after` is a script that continues the game on the map (the next chapter); without it the game returns to the title.
+  RPG.ending = async function (id) {
+    var c = RPG.db.config, e = id ? c.endings[id] : { pages: c.ending, card: c.endingCard, after: c.endingAfter };
     await RPG.fadeOut(40);
     RPG.go('ending');
+    RPG.scenes.ending.art = e.art || 'ending';
     await RPG.fadeIn(40);
-    var c = RPG.db.config, lines = (c.ending || []).filter(function (l) { return typeof l === 'string' || RPG.check(l['if']); })
+    var lines = (e.pages || []).filter(function (l) { return typeof l === 'string' || RPG.check(l['if']); })
       .map(function (l) { return typeof l === 'string' ? l : l.text; });
     RPG.scenes.ending.lines = lines;
     for (var i = 0; i < lines.length; i++) { RPG.scenes.ending.line = i; await RPG.ui.push({ update: function () { if (RPG.input.take('ok')) this.close(); } }); }
-    if (c.endingCard) await RPG.chapterCard(RPG.t(c.endingCard.top), RPG.t(c.endingCard.big), c.endingCard.sub && RPG.t(c.endingCard.sub));
+    if (e.card) await RPG.chapterCard(RPG.t(e.card.top), RPG.t(e.card.big), e.card.sub && RPG.t(e.card.sub));
     await RPG.fadeOut(30);
+    if (e.after) { RPG.go('map'); await RPG.fadeIn(20); await RPG.run(e.after); return; }
     RPG.go('title');
     await RPG.fadeIn(20);
   };
@@ -144,7 +150,8 @@
     update: function () {},
     draw: function () {
       var g = RPG.ctx;
-      if (RPG.db.backdrops.ending) RPG.db.backdrops.ending.draw(g, RPG.frame);
+      var bd = RPG.db.backdrops[this.art || 'ending'] || RPG.db.backdrops.ending;
+      if (bd) bd.draw(g, RPG.frame);
       if (RPG.fx.active()) RPG.fx.post({ bloom: 0.4, grade: 'dusk', vignette: 0.5 });
       var lines = this.lines || [], ln = RPG.say(lines[this.line] || '');
       RPG.box(20, 150, RPG.W - 40, 70);

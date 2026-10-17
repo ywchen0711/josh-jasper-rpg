@@ -23,7 +23,7 @@
       this.trail = [];
       for (var i = 0; i < 8; i++) this.trail.push({ x: s.x, y: s.y, dir: s.dir });
       this.npcs = (m.npcs || []).map(function (n) { return Object.assign({ x0: n.x, y0: n.y, fx: n.x, fy: n.y, dir: n.dir || 'down', t: 0, wanderT: RPG.ri(60, 180) }, n); });
-      this.busy = false;
+      this.busy = (this.busyN || 0) > 0;     // a script that warped here is still running: keep the map locked until it ends
       this.bannerT = 150;
       this.encounterSteps = 0;
       this.prepare();
@@ -112,8 +112,10 @@
 
     runBusy: function (promise) {
       var self = this;
-      this.busy = true;
-      return Promise.resolve(promise).then(function () { self.busy = false; }, function (e) { self.busy = false; console.error(e); });
+      // counts running scripts, so one finishing can't unlock the map while another (or the rest of a warping script) still runs
+      this.busyN = (this.busyN || 0) + 1; this.busy = true;
+      function done() { self.busyN = Math.max(0, self.busyN - 1); self.busy = self.busyN > 0; }
+      return Promise.resolve(promise).then(done, function (e) { done(); console.error(e); });
     },
 
     arrived: function () {
