@@ -19,7 +19,7 @@
       RPG.text(m.hp + '/' + st.maxHp, x + 212, my - 2, { size: 9, align: 'right' });
       RPG.text('MP', x + 96, my + 13, { size: 9, color: '#a0b0d0' }); RPG.bar(x + 112, my + 17, 66, 4, st.maxMp ? m.mp / st.maxMp : 0, '#60a0ff');
       RPG.text(m.mp + '/' + st.maxMp, x + 212, my + 12, { size: 9, align: 'right' });
-      if ((m.status || []).length) RPG.text(m.status.map(function (s) { return RPG.textOf('statuses', s.id, 'short'); }).join(''), x + 70, my + 13, { size: 9, color: '#e0a0ff' });
+      RPG.drawTags(RPG.statusTags(m), x + 30 + RPG.textWidth('Lv ' + m.level + (reserve ? '  ' + RPG.t('ui.reserve') : ''), 9) + 4, my + 13, { size: 8, maxW: 92 - 34 - RPG.textWidth('Lv ' + m.level + (reserve ? '  ' + RPG.t('ui.reserve') : ''), 9) });
     });
   }
   function descBox(text) {
@@ -194,6 +194,7 @@
         RPG.text(RPG.nameOf(m), 72, 16, { size: 14, bold: true, color: '#ffd860' });
         RPG.text(RPG.textOf('characters', m.id, 'title'), 72, 34, { size: 10, color: '#c8d0e8' });
         RPG.text(RPG.t('ui.expLine', { level: m.level, exp: m.exp, next: Math.max(0, RPG.expFor(m.level + 1) - m.exp) }), 72, 50, { size: 10 });
+        RPG.drawTags(RPG.statusTags(m), 72, 63, { size: 8, maxW: RPG.W - 90 });
         RPG.STATS.forEach(function (k, i) {
           var v = k === 'maxHp' ? m.hp + '/' + st.maxHp : k === 'maxMp' ? m.mp + '/' + st.maxMp : st[k];
           RPG.text(RPG.statName(k), 20, 74 + i * 16, { size: 10, color: '#a0b0d0' });

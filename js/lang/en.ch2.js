@@ -95,8 +95,8 @@ RPG.addText('en', {
     krakenHug: { name: 'Royal Squeeze' }, sandStorm: { name: 'Sandstorm' }, castleCrush: { name: 'Castle Crush' }, moatFlood: { name: 'Moat Flood' }
   },
   status: {
-    inked: { name: 'Inked', short: 'I', tick: '{name} has ink all over their face.' },
-    soggy: { name: 'Soggy', short: 'W', tick: '{name} is soaking wet and shivering!' }
+    inked: { name: 'Inked', short: 'INK', tick: '{name} has ink all over their face.' },
+    soggy: { name: 'Soggy', short: 'WET', tick: '{name} is soaking wet and shivering!' }
   },
   enemy: {
     crab:      { name: 'Sand Crab', defeat: '{name} scuttled away sideways!' },

@@ -26,6 +26,7 @@ RPG.addText('zh', {
     gotItem: '得到了「{item}」{count}！', gotGold: '得到了 {n} 元。', paidGold: '付了 {n} 元。', joined: '{name} 加入了隊伍！',
     chestEmpty: '裡面已經空了。'
   },
+  tag: { atk: '攻', def: '防', spd: '速', mag: '魔', luck: '運' },
   stat: { maxHp: 'HP', maxMp: 'MP', atk: '攻擊', def: '防禦', mag: '魔力', spd: '速度', luck: '幸運' },
   slot: { weapon: '武器', armor: '衣服', accessory: '飾品' },
 

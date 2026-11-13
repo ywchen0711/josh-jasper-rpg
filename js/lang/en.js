@@ -26,6 +26,7 @@ RPG.addText('en', {
     gotItem: 'Got {item}{count}!', gotGold: 'Got ${n}.', paidGold: 'Paid ${n}.', joined: '{name} joined the party!',
     chestEmpty: "It's empty."
   },
+  tag: { atk: 'ATK', def: 'DEF', spd: 'SPD', mag: 'MAG', luck: 'LCK' },
   stat: { maxHp: 'HP', maxMp: 'MP', atk: 'Attack', def: 'Defense', mag: 'Magic', spd: 'Speed', luck: 'Luck' },
   slot: { weapon: 'Weapon', armor: 'Clothes', accessory: 'Extra' },
 
@@ -41,7 +42,7 @@ RPG.addText('en', {
     allDown: 'Everyone is down...', victory: 'Victory!', reward: 'Got {exp} EXP and ${gold}',
     found: 'Found {item}', levelUp: '{name} reached Lv{level}!', learned: '  Learned {skill}',
     crit: 'Critical!', weak: 'Super effective!', resist: 'Not very effective...', revived: 'Revived!', missed: 'Miss', cured: 'Cured',
-    defTag: 'G'
+    defTag: 'GRD'
   },
 
   // ======================= people =======================
@@ -135,11 +136,11 @@ RPG.addText('en', {
     feast:      { name: 'Big Feast' }
   },
   status: {
-    sleep:  { name: 'Asleep', short: 'Zz', skip: '{name} is fast asleep...' },
-    scared: { name: 'Scared', short: '!', skip: "{name} is too scared to move!" },
-    sticky: { name: 'Sticky', short: '~', tick: '{name} is gross and gooey.' },
-    sad:    { name: 'Teary', short: ';;' },
-    pumped: { name: 'Pumped', short: '^' }
+    sleep:  { name: 'Asleep', short: 'SLP', skip: '{name} is fast asleep...' },
+    scared: { name: 'Scared', short: 'SCR', skip: "{name} is too scared to move!" },
+    sticky: { name: 'Sticky', short: 'STK', tick: '{name} is gross and gooey.' },
+    sad:    { name: 'Teary', short: 'SAD' },
+    pumped: { name: 'Pumped', short: 'PMP' }
   },
   enemy: {
     lizard:   { name: 'Fence Lizard' },
@@ -390,7 +391,7 @@ RPG.addText('en', {
   npc: { shadow: '???', dad: 'Dad (Jeff)' },
   enemy: { jeff: { name: 'Mysterious Shadow', defeat: '{name} throws up his hands: "Okay, okay, I give up!"' } },
   troop: { jeff: { intro: 'The shadow\'s eyes flash... "Let\'s see how strong you really are!"' } },
-  status: { giggle: { name: 'Giggling', short: 'Ha', skip: "{name} can't stop giggling!" } },
+  status: { giggle: { name: 'Giggling', short: 'GIG', skip: "{name} can't stop giggling!" } },
   skill: { dadJoke: { name: 'Dad Joke' }, tickle: { name: 'Tickle Attack' }, grounded: { name: "You're Grounded!" }, coffeeBreak: { name: 'Coffee Break' } },
   item: { dadTie: { name: "Dad's Lucky Tie", desc: 'Attack +4, Defense +4, Luck +4, HP +15. Has a coffee stain.' } },
   ending: { dad: 'Dad (Jeff) quietly hung the shadow cloak back in the closet and said he would test them again next year. Mom said: "Do the dishes first."' },

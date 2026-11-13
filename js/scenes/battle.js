@@ -8,6 +8,30 @@
  */
 (function () {
   'use strict';
+  // every status and buff on a fighter as small coloured tags: [{ text, color }]
+  RPG.statusTags = function (b) {
+    var out = (b.status || []).map(function (s) { var d = RPG.db.statuses[s.id] || {}; return { text: RPG.textOf('statuses', s.id, 'short'), color: d.color || '#e0a0ff' }; });
+    (b.buffs || []).forEach(function (bf) { if (bf.mult !== 1) out.push({ text: RPG.t('tag.' + bf.stat) + (bf.mult > 1 ? '↑' : '↓'), color: bf.mult > 1 ? '#ffb060' : '#80a0ff' }); });
+    if (b.defending) out.push({ text: RPG.t('battle.defTag'), color: '#c8d0e0' });
+    return out;
+  };
+  // draw tags in a row starting at x (align 'left'), ending at x ('right') or centred on x; when they don't fit in maxW,
+  // show as many as fit and page through the rest about once a second
+  RPG.drawTags = function (tags, x, y, opts) {
+    opts = opts || {}; if (!tags.length) return;
+    var size = opts.size || 8, g = RPG.ctx, ws = tags.map(function (t) { return Math.ceil(RPG.textWidth(t.text, size, true)) + 4; });
+    var pages = [], cur = [], w = 0, maxW = opts.maxW || 999;
+    tags.forEach(function (t, i) { if (cur.length && w + ws[i] > maxW) { pages.push(cur); cur = []; w = 0; } cur.push(i); w += ws[i] + 2; });
+    pages.push(cur);
+    var page = pages[Math.floor(RPG.frame / 60) % pages.length], tw = page.reduce(function (a, i) { return a + ws[i] + 2; }, -2);
+    var cx = opts.align === 'right' ? x - tw : opts.align === 'center' ? Math.round(x - tw / 2) : x;
+    page.forEach(function (i) {
+      g.fillStyle = 'rgba(0,0,0,0.7)'; g.fillRect(cx - 0.5, y - 0.5, ws[i] + 1, size + 3);
+      g.fillStyle = tags[i].color; g.fillRect(cx, y, ws[i], size + 2);
+      RPG.text(tags[i].text, cx + 2, y + 1, { size: size, bold: true, color: '#1a1428', shadow: false });
+      cx += ws[i] + 2;
+    });
+  };
   RPG.battle = async function (troopId, opts) {
     opts = opts || {};
     while (RPG.scene === RPG.scenes.battle && RPG.scenes.battle.b) await RPG.wait(1);    // never start a battle on top of another one
@@ -368,7 +392,7 @@
       RPG.drawSprite(e.def.sprite, e.x + dx, e.y + bob, { pose: 'idle', frame: Math.floor(RPG.frame / 24) % 2, scale: e.scale, palette: e.def.palette,
                                                          alpha: RPG.alive(e) ? 1 : 1 - e.deathT / 30, flash: e.flash });
       if (self.targetCursor === e) RPG.cursor(e.x + e.size / 2 - 3, e.y - 12 + Math.sin(RPG.frame / 6) * 2);
-      if (e.status.length && RPG.alive(e)) RPG.text(e.status.map(function (s) { return RPG.textOf('statuses', s.id, 'short'); }).join(''), e.x + e.size / 2, e.y - 4, { size: 8, align: 'center', color: '#e0a0ff' });
+      if (RPG.alive(e)) RPG.drawTags(RPG.statusTags(e), e.x + e.size / 2, e.y - 6, { size: 7, align: 'center', maxW: Math.max(40, e.size + 16) });
     });
     // party (facing left)
     this.party.forEach(function (m) {
@@ -403,8 +427,7 @@
       RPG.text('MP', 220, y + 1, { size: 8, color: '#a0b0d0' });
       RPG.bar(234, y + 4, 40, 4, st.maxMp ? m.mp / st.maxMp : 0, '#60a0ff');
       RPG.text(String(m.mp), 254, y + 6, { size: 8, align: 'center' });
-      var tags = (m.status || []).map(function (s) { return RPG.textOf('statuses', s.id, 'short'); }).join('') + (m.defending ? RPG.t('battle.defTag') : '');
-      if (tags) RPG.text(tags, 300, y, { size: 9, align: 'right', color: '#e0a0ff' });
+      RPG.drawTags(RPG.statusTags(m), RPG.W - 7, y + 1, { size: 7, align: 'right', maxW: RPG.W - 7 - 278 });
     });
   };
 })();
