@@ -422,10 +422,11 @@
       var y = top + 7 + i * rowH, st = RPG.stats(m), alive = RPG.alive(m);
       RPG.text(RPG.nameOf(m), 92, y, { size: 10, bold: true, color: self.active === m ? '#ffd860' : alive ? '#f4f0e8' : '#ff7070' });
       RPG.text('HP', 146, y + 1, { size: 8, color: '#a0b0d0' });
-      RPG.bar(160, y + 4, 52, 4, m.hp / st.maxHp, m.hp < st.maxHp * 0.3 ? '#ff6060' : '#60e080');
+      // the bar sits above its number with a gap, so the digits are never drawn over
+      RPG.bar(160, y + 2, 52, 3, m.hp / st.maxHp, m.hp < st.maxHp * 0.3 ? '#ff6060' : '#60e080');
       RPG.text(m.hp + '/' + st.maxHp, 186, y + 6, { size: 8, align: 'center' });
       RPG.text('MP', 220, y + 1, { size: 8, color: '#a0b0d0' });
-      RPG.bar(234, y + 4, 40, 4, st.maxMp ? m.mp / st.maxMp : 0, '#60a0ff');
+      RPG.bar(234, y + 2, 40, 3, st.maxMp ? m.mp / st.maxMp : 0, '#60a0ff');
       RPG.text(String(m.mp), 254, y + 6, { size: 8, align: 'center' });
       RPG.drawTags(RPG.statusTags(m), RPG.W - 7, y + 1, { size: 7, align: 'right', maxW: RPG.W - 7 - 278 });
     });

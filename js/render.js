@@ -55,6 +55,8 @@
         if (g.measureText(line + ch).width > width && line) {
           var sp = line.lastIndexOf(' ');
           if (/[^\s]/.test(ch) && sp > 0 && /[A-Za-z0-9,.!?'’]/.test(line[line.length - 1]) && /[A-Za-z0-9]/.test(ch)) { out.push(line.slice(0, sp)); line = line.slice(sp + 1); }
+          // Chinese punctuation never starts a line: carry the last character down with it
+          else if (/[，。、！？」』）：；…]/.test(ch) && line.length > 1 && !/[，。、！？」』）：；…]/.test(line[line.length - 1])) { out.push(line.slice(0, -1)); line = line.slice(-1); }
           else { out.push(line); line = ch === ' ' ? '' : ''; if (ch === ' ') continue; }
         }
         line += ch;

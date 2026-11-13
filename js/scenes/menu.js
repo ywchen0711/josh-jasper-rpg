@@ -173,7 +173,7 @@
   function statBox(m, change) {
     var now = RPG.stats(m), after = now;
     if (change) { var copy = JSON.parse(JSON.stringify(m)); copy.equip[change.slot] = change.item; after = RPG.stats(copy); }
-    RPG.box(210, 6, 104, 118);
+    RPG.box(210, 6, 104, 118, { sparkle: false }); // no corner sparkle: the change column runs to the right edge
     ['atk', 'def', 'mag', 'spd', 'luck', 'maxHp', 'maxMp'].forEach(function (k, i) {
       var y = 12 + i * 15, d = after[k] - now[k];
       RPG.text(RPG.statName(k), 218, y, { size: 10, color: '#a0b0d0' });
@@ -205,7 +205,8 @@
           RPG.text(RPG.slotName(s) + ': ' + (it ? RPG.name('items', it) : RPG.t('ui.none')), 140, 74 + i * 16, { size: 10 });
         });
         var skills = RPG.t('ui.skills') + ': ' + m.skills.map(function (id) { return RPG.name('skills', id); }).join(RPG.t('ui.listSep'));
-        RPG.wrap(skills, RPG.W - 160, 10).slice(0, 4).forEach(function (ln, i) { RPG.text(ln, 140, 126 + i * 14, { size: 10 }); });
+        var sl = RPG.wrap(skills, RPG.W - 160, 10); if (sl.length > 4) { sl = sl.slice(0, 4); sl[3] = sl[3].replace(/.$/, '') + '…'; }
+        sl.forEach(function (ln, i) { RPG.text(ln, 140, 126 + i * 14, { size: 10 }); });
         RPG.wrap(RPG.textOf('characters', m.id, 'bio'), RPG.W - 50, 10).forEach(function (ln, i) { RPG.text(ln, 20, 190 + i * 14, { size: 10, color: '#c8d0e8' }); });
       }
     });
